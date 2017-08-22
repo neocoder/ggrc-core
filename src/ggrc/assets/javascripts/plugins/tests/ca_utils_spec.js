@@ -129,3 +129,137 @@ describe('GGRC utils isEmptyCustomAttribute() method', function () {
     });
   });
 });
+
+describe('GGRC utils conflict resolution', function () {
+  var getDiffMap = GGRC.Utils.ConflictResolution.getDiffMap;
+
+  describe('object diff function', function () {
+    it('should traverse an one level object and return a change map',
+    function () {
+      var a = {
+        x: 1, y: 2, z: 3
+      };
+      var am = {
+        x: 1, y: 2, z: 4
+      };
+
+      var dm = getDiffMap(a, am);
+      expect(dm).toEqual({
+        z: {$from: 3, $to: 4}
+      });
+    });
+
+    it('should traverse an simple mulilevel object and return a change map',
+    function () {
+      var a = {
+        x: 1, y: 2, z: 3, zz: {foo: 'bar'}
+      };
+      var am = {
+        x: 1, y: 2, z: 4, zz: {foo: 'baz'}
+      };
+
+      var dm = getDiffMap(a, am);
+      expect(dm).toEqual({
+        z: {$from: 3, $to: 4},
+        'zz.foo': {$from: 'bar', $to: 'baz'}
+      });
+    });
+
+    it('should traverse a mulilevel object with arrays and return a change map',
+    function () {
+      var a = {
+        x: 1, y: 2, z: 3, zz: {foo: 'bar', arr: [1, 2, 3]}
+      };
+      var am = {
+        x: 1, y: 2, z: 4, zz: {foo: 'bar', arr: [1, 2, 4]}
+      };
+
+      var dm = getDiffMap(a, am);
+
+      expect(dm).toEqual({
+        z: {$from: 3, $to: 4},
+        'zz.arr[2]': {$from: 3, $to: 4}
+      });
+    });
+
+    it('should traverse a mulilevel object with a field missing in the ' +
+       '"from state" object',
+    function () {
+      var a = {
+        y: 2, z: 3, zz: {foo: 'bar', arr: [1, 2, 3]}
+      };
+      var am = {
+        x: 1, y: 2, z: 4, zz: {foo: 'bar', arr: [1, 2, 4]}
+      };
+
+      var dm = getDiffMap(a, am);
+
+      expect(dm).toEqual({
+        x: {$from: undefined, $to: 1},
+        z: {$from: 3, $to: 4},
+        'zz.arr[2]': {$from: 3, $to: 4}
+      });
+    });
+
+    it('should traverse a mulilevel object with a field missing in the ' +
+       '"to state" object',
+    function () {
+      var a = {
+        x: 1, y: 2, z: 3, zz: {foo: 'bar', arr: [1, 2, 3]}
+      };
+      var am = {
+        x: 1, y: 2, z: 4, zz: {foo: 'bar'}
+      };
+
+      var dm = getDiffMap(a, am);
+
+      expect(dm).toEqual({
+        z: {$from: 3, $to: 4},
+        'zz.arr': {$from: [1, 2, 3], $to: undefined}
+      });
+    });
+
+    it('should traverse an object with sub-objects in arrays',
+    function () {
+      var a = {
+        x: 1, y: 2, z: 3, items: [
+          {one: 1, two: 2},
+          {three: 3, four: 4}
+        ]
+      };
+      var am = {
+        x: 1, y: 2, z: 4, items: [
+          {one: 1, two: 22},
+          {three: 3, four: 4}
+        ]
+      };
+
+      var dm = getDiffMap(a, am);
+
+      expect(dm).toEqual({
+        z: {$from: 3, $to: 4},
+        'items[0].two': {$from: 2, $to: 22}
+      });
+    });
+
+    it('should traverse an object and check only specific fields',
+    function () {
+      var dm;
+      var a = {
+        x: 1, y: 2, z: 3, zz: {foo: 'bar'}, hello: 'word'
+      };
+      var am = {
+        x: 1, y: 2, z: 4, zz: {foo: 'baz'}, hello: 'universe'
+      };
+      var checkFields = ['x', 'y', 'z', 'zz'];
+
+      expect(a.hello).not.toBe(am.hello);
+
+      dm = getDiffMap(a, am, checkFields);
+      expect(dm).toEqual({
+        z: {$from: 3, $to: 4},
+        'zz.foo': {$from: 'bar', $to: 'baz'}
+      });
+    });
+  });
+});

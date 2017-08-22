@@ -849,5 +849,117 @@
       getParentUrl: getParentUrl
     };
   })();
+
+  /**
+   * Util methods for Model saving conflict resolution
+   */
+  GGRC.Utils.ConflictResolution = (function () {
+    var editableFields = {
+      Assessment: [
+        'title', 'access_control_list', 'assessment_type',
+        'assignees', 'custom_attribute_values',
+        'description', 'design', 'end_date', 'finished_date',
+        'global_attributes', 'id', 'local_attributes',
+        'notes', 'operationally', 'os_state', 'slug', 'start_date',
+        'status', 'test_plan', 'type', 'verified'
+      ],
+      Contol: [
+        'title', 'access_control_list', 'attributes',
+        'description', 'end_date', 'folders',
+        'id', 'last_assessment_date', 'means',
+        'notes', 'object_folders', 'os_state',
+        'preconditions_failed', 'slug', 'start_date',
+        'status', 'test_plan', 'type', 'verify_frequency',
+        'version'
+      ]
+    };
+
+    /**
+     * Creates a change map of object a changed to b
+     * @param  {object} fromState source object state
+     * @param  {object} toState target object state
+     * @param  {array}  checkFields array of fields to check and include in diffMap
+     * @return {object}   change map in format of { 'a.b.c': { $from: 1, $to: 2 } }
+     */
+    function getDiffMap(fromState, toState, checkFields) {
+      function getPathSegment(rootPath, key, isArrayKey) {
+        rootPath = rootPath || '';
+        if (isArrayKey) {
+          return rootPath + '[' + key + ']';
+        }
+
+        return rootPath ?
+          rootPath + '.' + key :
+          key;
+      }
+
+      function traverseObjects(a, b, rootPath) {
+        var changeMap = {};
+        var aks = Object.keys(a);
+        var bks = Object.keys(b);
+        var aIsArray = _.isArray(a);
+        var bIsArray = _.isArray(b);
+
+        aks.forEach(function (ak) {
+          if (_.includes(bks, ak)) {
+            // exists in new object
+            if (_.isPlainObject(a[ak])) {
+              _.extend(changeMap,
+                traverseObjects(
+                  a[ak], b[ak], getPathSegment(rootPath, ak, aIsArray)
+                )
+              );
+            } else if (_.isArray(a[ak])) {
+              _.extend(changeMap,
+                traverseObjects(
+                  a[ak], b[ak], getPathSegment(rootPath, ak, aIsArray)
+                )
+              );
+            } else if (!_.isEqual(a[ak], b[ak])) {
+              changeMap[getPathSegment(rootPath, ak, aIsArray)] =
+                {$from: a[ak], $to: b[ak]};
+            }
+          } else {
+            // does not exist in new object
+            changeMap[getPathSegment(rootPath, ak, aIsArray)] =
+              {$from: a[ak], $to: undefined};
+          }
+        });
+
+        bks.forEach(function (bk) {
+          if (!_.includes(aks, bk)) {
+            changeMap[getPathSegment(rootPath, bk, bIsArray)] =
+              {$from: undefined, $to: b[bk]};
+          }
+        });
+
+        return changeMap;
+      }
+
+      return traverseObjects(
+        checkFields ? _.pick(fromState, checkFields) : fromState,
+        checkFields ? _.pick(toState, checkFields) : toState
+      );
+    }
+
+    /**
+     * Applies DiffMap changes to the object
+     * @param  {Object} target   target object
+     * @param  {diffMap} diffMap diff map with the changes
+     * @return {Object}          target object
+     */
+    function applyDiffMap(target, diffMap) {
+      Object.keys(diffMap).forEach(function (path) {
+        _.set(target, path, diffMap[path].$to);
+      });
+      return target;
+    }
+
+    return {
+      editableFields: editableFields,
+      getDiffMap: getDiffMap,
+      applyDiffMap: applyDiffMap
+    };
+  })();
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission,
   window.CMS = window.CMS || {});

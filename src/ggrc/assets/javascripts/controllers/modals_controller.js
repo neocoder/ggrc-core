@@ -1172,7 +1172,6 @@
         if (error.status !== 409) {
           GGRC.Errors.notifier('error', error.responseText);
         } else {
-          clearTimeout(error.warningId);
           GGRC.Errors.notifierXHR('warning')(error);
         }
       }

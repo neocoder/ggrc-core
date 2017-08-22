@@ -7,6 +7,11 @@
 
 (function (can, GGRC, CMS) {
   var _oldAttr;
+
+  var getDiffMap = GGRC.Utils.ConflictResolution.getDiffMap;
+  var applyDiffMap = GGRC.Utils.ConflictResolution.applyDiffMap;
+  var editableFields = GGRC.Utils.ConflictResolution.editableFields;
+
   function makeFindRelated(thistype, othertype) {
     return function (params) {
       if (!params[thistype + '_type']) {
@@ -296,17 +301,7 @@
         .then(
           this.resolve_deferred_bindings.bind(this),
           function (xhr) {
-            if (xhr.status === 409) {
-              xhr.warningId = setTimeout(function () {
-                $(document.body).trigger('ajax:flash', {
-                  warning: 'There was a conflict while saving.' +
-                  ' Your changes have not yet been saved.' +
-                  ' Please check any fields you were editing' +
-                  ' and try saving again'
-                });
-              });
               // TODO: we should show modal window here
-            }
             return xhr;
           }
         );
@@ -1269,11 +1264,118 @@
       });
       return dfd;
     },
+    // save: function () {
+    //   Array.prototype.push.call(arguments, this._super);
+    //   this._dfd = new can.Deferred();
+    //   GGRC.SaveQueue.enqueue(this, arguments);
+    //   return this._dfd;
+    // },
     save: function () {
+      var self = this;
+      var currentInstance = _.merge({}, this.attr());
+      var backup = _.merge({}, this._backupStore());
+      var dfd = can.Deferred();
+
+      console.log('save with merge');
+      console.log(arguments);
+
+
+      /* OLD SAVE */
       Array.prototype.push.call(arguments, this._super);
       this._dfd = new can.Deferred();
       GGRC.SaveQueue.enqueue(this, arguments);
-      return this._dfd;
+      /* */
+
+
+
+      this._dfd.then(function (response) {
+        // successs
+        console.log('Success! Saved!');
+        dfd.resolve(response);
+      }, function (inst, response) {
+        console.log('ERROR');
+
+        if (response.status !== 409) {
+          dfd.reject(response);
+          return;
+        }
+        console.log('ERROR: 409');
+
+        self.constructor.findOne({id: self.id})
+          .then(function (lastRevision) {
+            var theirChangesDiff;
+            var myChangesDiff;
+            var hasIntersection;
+            var diffIntersection;
+            var modifier = {};
+            var instanceEditableFields = editableFields[self.type];
+            if (!instanceEditableFields) {
+              throw new Error(
+                'There are not config of editable fields for ' +
+                self.type + ' model'
+              );
+            }
+
+            console.log('backup', backup);
+            console.log('currentInstance', currentInstance);
+            console.log('lastRevision', lastRevision.attr());
+
+
+            theirChangesDiff = getDiffMap(
+              backup, lastRevision.attr(), instanceEditableFields
+            );
+            myChangesDiff = getDiffMap(
+              backup, currentInstance, instanceEditableFields
+            );
+
+            console.log('theirChangesDiff', theirChangesDiff);
+            console.log('myChangesDiff', myChangesDiff);
+
+            diffIntersection =
+              _.intersection(
+                Object.keys(theirChangesDiff), Object.keys(myChangesDiff)
+              );
+
+            hasIntersection = diffIntersection.length;
+
+            console.log('diffIntersection', diffIntersection);
+            console.log('hasIntersection', hasIntersection);
+
+            if (!hasIntersection) {
+              applyDiffMap(modifier, theirChangesDiff);
+              applyDiffMap(modifier, myChangesDiff);
+
+              // merge
+              self.attr(modifier);
+
+              // ACL issue! check!
+              self.dispatch('instanceMerged');
+
+              // recursive...
+              self.save().then(function (response) {
+                console.log('Success! Saved after merge');
+                dfd.resolve(response);
+              }, function (response) {
+                console.log('Error! Rejected after merge');
+                dfd.reject(response);
+              });
+            } else {
+              // show error banner with RESTART button
+              $(document.body).trigger('ajax:flash', {
+                warning: 'There was a conflict while saving.' +
+                ' Your changes have not yet been saved.' +
+                ' Please check any fields you were editing' +
+                ' and try saving again'
+              });
+
+              console.error('CONFLIT 409! Red banner and Restart link!');
+              dfd.reject(response);
+            }
+          });
+        return dfd;
+      });
+
+      return dfd;
     },
     refresh_all: function () {
       var props = Array.prototype.slice.call(arguments, 0);
