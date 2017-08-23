@@ -18,7 +18,7 @@ Procure an ASV Vendor
 ,Consolidated,SOC program,,,miha@reciprocitylabs.com,,,,,Draft,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,
 Object type,"Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required",,,,,,,,,,,,,,,,,,,,,,,,
-Control,Code*,Title*,Description,,,Admin*,Effective Date,Last Deprecated Date,State,Assertions,Categories,,Fraud Related,Significance,Kind/Nature,Type/Means,,,,,,Frequency,Test Plan,Notes,map:program
+Control,Code*,Title*,Description,,,Admin*,Effective Date,Last Deprecated Date,State,Assertions,Categories,,Fraud Related,Significance,Kind/Nature,Type/Means,,,,,,Frequency,Assessment Procedure,Notes,map:program
 ,PCI 1.1,PCI 1.1 Firewall and Router Configuration,"1.1 Establish and implement firewall and router configuration standards that include the following:<br><br>
 
 1.1.1 A formal process for approving and testing all network connections and changes to the firewall and router configurations<br><br>
@@ -116,7 +116,7 @@ PCI 2.5
 PCI 2.6",PCI Program,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,
 Object type,"Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required",,,,,,,,,,,,,,,,,,,,,,,,
-Assessment,Code*,Audit*,Title*,Description,Notes,Test Plan,Creators,Assignees,Effective Date,Stop Date,State,,Conclusion: Design,Conclusion: Operation,,,,,,,,,,,
+Assessment,Code*,Audit*,Title*,Description,Notes,Assessment Procedure,Creators,Assignees,Effective Date,Stop Date,State,,Conclusion: Design,Conclusion: Operation,,,,,,,,,,,
 ,CA.PCI 1.1,AUDIT-PCI,PCI 1.1 Firewall and Router Configuration assessment for 2015: PCI-DSS 3.0 Security Program (Reference Program) - Audit 1 1,,,,danny@reciprocitylabs.com,danny@reciprocitylabs.com,,,Not Started,,Effective,Effective,,,,,,,,,,,
 ,CA.PCI 1.2,AUDIT-PCI,PCI 1.2 Firewall and Router Connections Configuration assessment for 2015: PCI-DSS 3.0 Security Program (Reference Program) - Audit 1 1,,,,danny@reciprocitylabs.com,danny@reciprocitylabs.com,,,Not Started,,Needs improvement,Needs improvement,,,,,,,,,,,
 ,CA.PCI 1.2.1,AUDIT-PCI,PCI 1.2.1 Traffic Restrictions assessment for 2015: PCI-DSS 3.0 Security Program (Reference Program) - Audit 1 1,,,,danny@reciprocitylabs.com,danny@reciprocitylabs.com,,,Not Started,,Not Applicable,Not Applicable,,,,,,,,,,,

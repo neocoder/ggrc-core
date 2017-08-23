@@ -51,7 +51,7 @@ Person,Name,Email*,Company,Role,map:clause,map:contract,map:control,map:objectiv
 ,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,
 Object type,"Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required",,,,,,,,,,,,,,,,,,,
-Assessment,Code*,Audit*,Title*,Description,Notes,Test Plan,Assignees*,Creators*,Verifiers,Effective Date,Stop Date,State*,,Conclusion: Design,Conclusion: Operation,,,,Finished Date,Verified Date
+Assessment,Code*,Audit*,Title*,Description,Notes,Assessment Procedure,Assignees*,Creators*,Verifiers,Effective Date,Stop Date,State*,,Conclusion: Design,Conclusion: Operation,,,,Finished Date,Verified Date
 ,PMRBACASSESSMENT-1,AUDIT-1,Program Manager Audit RBAC Test,,,,user@example.com,user@example.com,,,,In Progress,,,,,,,,
 ,PMRBACASSESSMENT-2,AUDIT-2,Program Manager Audit RBAC Test Archived,,,,user@example.com,user@example.com,,,,In Progress,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,
@@ -66,7 +66,7 @@ Contract,Code*,Title*,Description,Notes,Admin*,Effective Date,Last Deprecated Da
 ,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,
 Object type,"Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required",,,,,,,,,,,,,,,,,,,
-Control,Code*,Title*,Description,Notes,Test Plan,Admin*,Effective Date,Last Deprecated Date,State,Assertions,Categories,Fraud Related,Significance,Kind/Nature,Type/Means,,,Frequency,map:program,
+Control,Code*,Title*,Description,Notes,Assessment Procedure,Admin*,Effective Date,Last Deprecated Date,State,Assertions,Categories,Fraud Related,Significance,Kind/Nature,Type/Means,,,Frequency,map:program,
 ,PMRBACCONTROL-1,Program Manager Audit RBAC Test,,,,user@example.com,,,Draft,,,--,--,,,,,,PMRBACPROGRAM-1,
 ,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,

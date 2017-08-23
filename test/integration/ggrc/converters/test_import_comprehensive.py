@@ -220,7 +220,7 @@ class TestComprehensiveSheets(TestCase):
         "Control": {
             "block_errors": {
                 errors.DUPLICATE_COLUMN.format(
-                    line=1, duplicates="title, notes, test plan"),
+                    line=1, duplicates="title, assessment procedure, notes"),
             },
         },
         "Program": {

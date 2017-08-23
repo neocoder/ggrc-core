@@ -405,7 +405,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Title",
         "Template",
         "Description",
-        "Test Plan",
+        "Assessment Procedure",
         "Notes",
         "Audit",
         "Archived",
@@ -550,7 +550,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     names = {
         "Title",
         "Description",
-        "Test Plan",
+        "Assessment Procedure",
         "Notes",
         "Admin",
         "Reference URL",

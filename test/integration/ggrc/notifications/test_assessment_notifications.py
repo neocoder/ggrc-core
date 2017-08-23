@@ -113,7 +113,7 @@ class TestAssessmentNotification(TestCase):
     updated = notif_data["user@example.com"]["assessment_updated"]
     self.assertEqual(len(notifs), 1)
     self.assertEqual(updated[self.assessment.id]["updated_fields"],
-                     ["TEST PLAN"])
+                     ["ASSESSMENT PROCEDURE"])
 
   def test_custom_attr_change(self):
     """Test notification when custom attribute value is changed"""
@@ -198,7 +198,7 @@ class TestAssessmentNotification(TestCase):
     updated = notif_data["user@example.com"]["assessment_updated"]
     self.assertEqual(len(notifs), 1)
     self.assertEqual(sorted(updated[self.assessment.id]["updated_fields"]),
-                     ["TEST PLAN", "TITLE"])
+                     ["ASSESSMENT PROCEDURE", "TITLE"])
 
   def test_multiply_mapping(self):
     """Test notification for multiply mapping"""

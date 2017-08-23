@@ -221,7 +221,7 @@ Urbon.S@example.com",au-12,,,,,,,,,,
 Urbon.S@example.com",au-13,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,
 Object Type,,,,,,,,,,,,,,,,,,,,,
-assessment,Title,Description,Notes,Test Plan,Audit,,,,,Code,Effective Date,Stop Date,State,Conclusion: Design,Conclusion: Operation,,,,,,
+assessment,Title,Description,Notes,Assessment Procedure,Audit,,,,,Code,Effective Date,Stop Date,State,Conclusion: Design,Conclusion: Operation,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,
 Object Type,,,,,,,,,,,,,,,,,,,,,
@@ -613,7 +613,7 @@ Workflow,code*,title*,description,manager,frequency,force real-time email update
 ,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,
 Object Type,,,,,,,,,,,,,,,,,,,,,
-control,Title,Description,Test Plan,Notes,Admin,Reference URL,Code,Kind/Nature,Fraud Related,Significance,Type/Means,Effective Date,Last Deprecated Date,Frequency,Assertions,Categories,,,State,map:standard,map:clause
+control,Title,Description,Assessment Procedure,Notes,Admin,Reference URL,Code,Kind/Nature,Fraud Related,Significance,Type/Means,Effective Date,Last Deprecated Date,Frequency,Assertions,Categories,,,State,map:standard,map:clause
 ,Startupsum 115,Series A financing success channels.<br> Ecosystem conversion rockstar value proposition bandwidth,success 111,,smotko@example.com,http://i.imgur.com/aP8UU5I.jpg,control-1,Preventative,yes,,Technical,,,Monthly,Confidentiality,,,,Draft,"standard-1
 standard-5","clause-1
 clause-2"
