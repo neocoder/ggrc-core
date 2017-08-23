@@ -287,6 +287,7 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
       },
       # overrides values from PublicDocumentable mixin
       "document_url": None,
+      "test_plan": "Assessment Procedure",
   }
 
   @validates('kind', 'means', 'verify_frequency')
