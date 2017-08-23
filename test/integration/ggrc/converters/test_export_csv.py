@@ -1,13 +1,16 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
+import string
 from os.path import abspath, dirname, join
+
+import ddt
 from flask.json import dumps
 
 from ggrc.converters import get_importables
 from ggrc.models.reflection import AttributeInfo
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
+from integration.ggrc.models.factories import random_str
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
@@ -352,6 +355,7 @@ class TestExportSingleObject(TestCase):
     self.assertEqual(sorted(failed), [])
 
 
+@ddt.ddt
 class TestExportMultipleObjects(TestCase):
 
   def setUp(self):
@@ -509,3 +513,34 @@ class TestExportMultipleObjects(TestCase):
         self.assertIn(",Cheese ipsum ch {},".format(i), response.data)
       else:
         self.assertNotIn(",Cheese ipsum ch {},".format(i), response.data)
+
+  @ddt.data(
+      factories.ControlFactory,
+      factories.AssessmentFactory,
+  )
+  def test_asmnt_procedure_export(self, obj_factory):
+    """Test export of Assessment Procedure."""
+    with factories.single_commit():
+      objects = [
+          obj_factory(test_plan=random_str(chars=string.ascii_letters))
+          for _ in range(10)
+      ]
+
+    obj_dicts = [
+        {
+            "Code*": obj.slug,
+            "Assessment Procedure": obj.test_plan if obj.test_plan else ""
+        } for obj in objects
+    ]
+
+    model_name = objects[0].type  # All objects has same type as first
+    search_request = [{
+        "object_name": model_name,
+        "filters": {
+            "expression": {},
+            "order_by": {"name": "id"}
+        },
+        "fields": ["slug", "test_plan"],
+    }]
+    exported_data = self.export_parsed_csv(search_request)[model_name]
+    self.assertEqual(exported_data, obj_dicts)
