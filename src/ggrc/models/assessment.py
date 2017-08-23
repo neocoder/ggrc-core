@@ -207,6 +207,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
           "ignore_on_update": True,
           "view_only": True,
       },
+      "test_plan": "Assessment Procedure",
   }
 
   AUTO_REINDEX_RULES = [
