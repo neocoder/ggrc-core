@@ -194,6 +194,14 @@ class TestCase(BaseTestCase, object):
                      "EXPECTED:\n{}\n\nRECEIVED:\n{}".format(
                          expected_str, response_str))
 
+  def check_import_errors(self, response):
+    """Check if import response doesn't contain any errors"""
+    messages = ("block_errors", "row_errors")
+    for block in response:
+      for message in messages:
+        errors = block.get(message, [])
+        self.assertEqual(errors, [], str(errors))
+
   @classmethod
   def import_data(cls, *import_data, **kwargs):
     """generate tmp file in csv directory and import it after that remove file

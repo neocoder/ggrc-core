@@ -109,6 +109,7 @@ class TestCustomAttributesDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        "Assessment Procedure",
         'Created Date',
         'Last Updated',
         'Last Updated By',
@@ -539,6 +540,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        "Assessment Procedure",
         'Created Date',
         'Last Updated',
         'Last Updated By',
@@ -564,6 +566,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         'Created Date',
         'Last Updated',
         'Last Updated By',
+        "Assessment Procedure",
     }
     self._test_single_object(models.Clause, names, self.COMMON_EXPECTED)
 
@@ -585,6 +588,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         'Created Date',
         'Last Updated',
         'Last Updated By',
+        "Assessment Procedure",
     }
     self._test_single_object(models.Section, names, self.COMMON_EXPECTED)
 
@@ -637,6 +641,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        "Assessment Procedure",
         'Created Date',
         'Last Updated',
         'Last Updated By',
@@ -681,6 +686,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        "Assessment Procedure",
         'Created Date',
         'Last Updated',
         'Last Updated By',
@@ -704,6 +710,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        "Assessment Procedure",
         'Created Date',
         'Last Updated',
         'Last Updated By',
@@ -727,6 +734,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        "Assessment Procedure",
         'Created Date',
         'Last Updated',
         'Last Updated By',
@@ -749,6 +757,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Title",
         "Primary Contacts",
         "Secondary Contacts",
+        "Assessment Procedure",
         'Created Date',
         'Last Updated',
         'Last Updated By',
@@ -795,6 +804,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        "Assessment Procedure",
         'Created Date',
         'Last Updated',
         'Last Updated By',
@@ -827,6 +837,7 @@ class TestRiskAssessmentColumnDefinitions(TestCase):
         "Code",
         "Program",
         "Delete",
+        "Assessment Procedure",
         'Created Date',
         'Last Updated',
         'Last Updated By',

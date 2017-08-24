@@ -1,16 +1,16 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-import string
 from os.path import abspath, dirname, join
 
+import collections
 import ddt
 from flask.json import dumps
 
 from ggrc.converters import get_importables
+from ggrc.models import inflector
 from ggrc.models.reflection import AttributeInfo
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
-from integration.ggrc.models.factories import random_str
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
@@ -515,32 +515,71 @@ class TestExportMultipleObjects(TestCase):
         self.assertNotIn(",Cheese ipsum ch {},".format(i), response.data)
 
   @ddt.data(
-      factories.ControlFactory,
-      factories.AssessmentFactory,
+      "Assessment",
+      "Policy",
+      "Regulation",
+      "Standard",
+      "Contract",
+      "Control",
+      "Section",
+      "Objective",
+      "Product",
+      "System",
+      "Process",
+      "Access Group",
+      "Clause",
+      "Data Asset",
+      "Facility",
+      "Market",
+      "Org Group",
+      "Project",
+      "Vendor",
+      "Risk Assessment",
+      "Risk",
+      "Threat",
   )
-  def test_asmnt_procedure_export(self, obj_factory):
+  def test_asmnt_procedure_export(self, model):
     """Test export of Assessment Procedure."""
     with factories.single_commit():
-      objects = [
-          obj_factory(test_plan=random_str(chars=string.ascii_letters))
-          for _ in range(10)
-      ]
+      program = factories.ProgramFactory()
+      audit = factories.AuditFactory(program=program)
+    import_queries = []
+    for i in range(3):
+      import_queries.append(collections.OrderedDict([
+          ("object_type", model),
+          ("Assessment Procedure", "Procedure-{}".format(i)),
+          ("Title", "Title {}".format(i)),
+          ("Code*", "{}-{}".format(model, i)),
+          ("Admin", "user@example.com"),
+          ("Assignees", "user@example.com"),
+          ("Creators", "user@example.com"),
+          ("Description", "{} description".format(model)),
+          ("Program", program.slug),
+          ("Audit", audit.slug),
+          ("Start Date", ""),
+          ("End Date", ""),
+      ]))
+    self.check_import_errors(self.import_data(*import_queries))
+
+    model_cls = inflector.get_model(model)
+    objects = model_cls.query.order_by(model_cls.test_plan).all()
+    self.assertEqual(len(objects), 3)
+    for num, obj in enumerate(objects):
+      self.assertEqual(obj.test_plan, "Procedure-{}".format(num))
 
     obj_dicts = [
         {
             "Code*": obj.slug,
-            "Assessment Procedure": obj.test_plan if obj.test_plan else ""
-        } for obj in objects
+            "Assessment Procedure": "Procedure-{}".format(i)
+        } for i, obj in enumerate(objects)
     ]
-
-    model_name = objects[0].type  # All objects has same type as first
     search_request = [{
-        "object_name": model_name,
+        "object_name": model_cls.__name__,
         "filters": {
             "expression": {},
             "order_by": {"name": "id"}
         },
         "fields": ["slug", "test_plan"],
     }]
-    exported_data = self.export_parsed_csv(search_request)[model_name]
+    exported_data = self.export_parsed_csv(search_request)[model]
     self.assertEqual(exported_data, obj_dicts)
