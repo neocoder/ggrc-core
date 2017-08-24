@@ -913,7 +913,7 @@ class TestPlanned(object):
   _api_attrs = reflection.ApiAttributes('test_plan')
   _fulltext_attrs = ['test_plan']
   _sanitize_html = ['test_plan']
-  _aliases = {"test_plan": "Test Plan"}
+  _aliases = {"test_plan": "Assessment Procedure"}
 
   @classmethod
   def indexed_query(cls):

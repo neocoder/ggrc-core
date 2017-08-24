@@ -5,7 +5,7 @@
 
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
-from ggrc.models.mixins import CustomAttributable
+from ggrc.models.mixins import CustomAttributable, TestPlanned
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import Noted
 from ggrc.models.mixins import Slugged
@@ -21,7 +21,7 @@ from ggrc.models import reflection
 
 class RiskAssessment(Documentable, Timeboxed, Noted, Described,
                      CustomAttributable, Titled, Relatable, Slugged,
-                     Indexed, db.Model):
+                     TestPlanned, Indexed, db.Model):
   """Risk Assessment model."""
   __tablename__ = 'risk_assessments'
   _title_uniqueness = False
@@ -74,7 +74,7 @@ class RiskAssessment(Documentable, Timeboxed, Noted, Described,
           "display_name": "Program",
           "mandatory": True,
           "filter_by": "_filter_by_program",
-      }
+      },
   }
 
   @classmethod

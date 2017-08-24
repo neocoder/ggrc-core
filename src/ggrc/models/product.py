@@ -8,7 +8,7 @@ from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
-                                CustomAttributable)
+                                CustomAttributable, TestPlanned)
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
 from ggrc.models.option import Option
@@ -20,7 +20,7 @@ from ggrc.models.track_object_state import HasObjectState
 
 class Product(Roleable, HasObjectState, CustomAttributable, Personable,
               Relatable, LastDeprecatedTimeboxed, PublicDocumentable,
-              BusinessObject, Indexed, db.Model):
+              TestPlanned, BusinessObject, Indexed, db.Model):
   __tablename__ = 'products'
 
   kind_id = deferred(db.Column(db.Integer), 'Product')

@@ -4,7 +4,7 @@
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
-                                CustomAttributable)
+                                CustomAttributable, TestPlanned)
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
@@ -13,7 +13,7 @@ from ggrc.fulltext.mixin import Indexed
 
 
 class AccessGroup(Roleable, HasObjectState, PublicDocumentable,
-                  CustomAttributable, Personable, Relatable,
+                  CustomAttributable, Personable, Relatable, TestPlanned,
                   LastDeprecatedTimeboxed, BusinessObject, Indexed, db.Model):
   __tablename__ = 'access_groups'
 

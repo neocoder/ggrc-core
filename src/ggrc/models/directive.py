@@ -8,7 +8,7 @@ from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
-                                CustomAttributable)
+                                CustomAttributable, TestPlanned)
 from ggrc.models import reflection
 from ggrc.fulltext.mixin import Indexed
 from .object_document import PublicDocumentable
@@ -27,7 +27,7 @@ from .track_object_state import HasObjectState
 # (of course, if there is a nice way of overriding/customizing declared
 # attributes in subclasses, we might want to use that approach)
 class Directive(HasObjectState, LastDeprecatedTimeboxed,
-                BusinessObject, db.Model):
+                TestPlanned, BusinessObject, db.Model):
   __tablename__ = 'directives'
 
   version = deferred(db.Column(db.String), 'Directive')

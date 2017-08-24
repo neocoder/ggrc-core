@@ -5,7 +5,7 @@ from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from .mixins import (BusinessObject, LastDeprecatedTimeboxed,
-                     CustomAttributable)
+                     CustomAttributable, TestPlanned)
 from .object_document import PublicDocumentable
 from .object_person import Personable
 from .relationship import Relatable
@@ -14,7 +14,7 @@ from .track_object_state import HasObjectState
 
 class Market(Roleable, HasObjectState, CustomAttributable, Personable,
              Relatable, LastDeprecatedTimeboxed, PublicDocumentable,
-             BusinessObject, Indexed, db.Model):
+             TestPlanned, BusinessObject, Indexed, db.Model):
   __tablename__ = 'markets'
   _aliases = {
       "document_url": None,
