@@ -115,6 +115,7 @@ class TestAssessment(ggrc.TestCase):
     self.assertEqual(assessment.audit_id, correct_audit_id)
 
 
+@ddt.ddt
 @base.with_memcache
 class TestAssessmentUpdates(ggrc.TestCase):
   """ Test various actions on Assessment updates """
@@ -195,6 +196,72 @@ class TestAssessmentUpdates(ggrc.TestCase):
         new_state,
         content.json['assessments_collection']['assessments'][0]['status']
     )
+
+  @ddt.data(
+      (None, "Control", "Control plan - {}"),
+      ("", "Control", "Control plan - {}"),
+      ("Asmnt plan", "Control", "Control plan - {}"),
+      ("Asmnt plan", "Market", "Control plan - {}"),
+      (None, "Control", None),
+      ("", "Control", None),
+      ("Asmnt plan", "Control", None),
+      (None, "Control", ""),
+      ("", "Control", ""),
+      ("Asmnt plan", "Control", ""),
+  )
+  @ddt.unpack
+  def test_assessment_proc_on_map(self, asmnt_plan, asmnt_type, test_plan):
+    """Test if Snapshot test_plan added to Assessment after mapping"""
+    # pylint: disable=too-many-locals
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(
+          audit=audit, assessment_type=asmnt_type, test_plan=asmnt_plan
+      )
+      factories.RelationshipFactory(source=audit, destination=assessment)
+      controls = [
+          factories.ControlFactory(
+              test_plan=test_plan.format(i) if test_plan else test_plan
+          )
+          for i in range(3)
+      ]
+    snapshots = self._create_snapshots(audit, controls)
+
+    asmnt_tps = [assessment.test_plan] if assessment.test_plan else []
+    if assessment.assessment_type == controls[0].type:
+      control_plans = [control.test_plan for control in controls
+                       if control.test_plan]
+      expected_tps = None
+      # If Assessment plan is None and Snapshots has empty plan, final plan
+      # should be None also
+      if asmnt_plan is not None or test_plan:
+        expected_tps = "\n\n".join(asmnt_tps + control_plans)
+    else:
+      expected_tps = assessment.test_plan
+
+    relation = [{
+        "relationship": {
+            "context": {
+                "context_id": None,
+                "id": assessment.context_id,
+                "type": "Context"
+            },
+            "destination": {
+                "id": snapshot.id,
+                "type": "Snapshot"
+            },
+            "source": {
+                "id": assessment.id,
+                "type": "Assessment"
+            }
+        }
+    } for snapshot in snapshots]
+
+    response = self.api.post(all_models.Relationship, relation)
+    self.assertEqual(response.status_code, 200)
+
+    asmnt = all_models.Assessment.query.get(assessment.id)
+    self.assertEqual(asmnt.test_plan, expected_tps)
 
 
 @ddt.ddt
