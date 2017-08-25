@@ -88,6 +88,8 @@ def init_hook():
           audit.title,
       )
       if not template:
+        # Assessment test plan should inherit test plan of snapshot
+        assessment.test_plan = snapshot.revision.content.get("test_plan")
         continue
       if template.test_plan_procedure:
         assessment.test_plan = snapshot.revision.content['test_plan']
