@@ -805,3 +805,10 @@ class TestAssessmentGeneration(ggrc.TestCase):
       self.assertEqual(assessment.assessment_type, exp_type)
     else:
       self.assertEqual(response.status_code, 400)
+
+  def test_generated_test_plan(self):
+    """Check if generated Assessment inherit test plan of Snapshot"""
+    test_plan = self.control.test_plan
+    response = self.assessment_post()
+    self.assertEqual(response.status_code, 201)
+    self.assertEqual(response.json["assessment"]["test_plan"], test_plan)
