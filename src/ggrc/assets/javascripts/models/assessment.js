@@ -21,6 +21,7 @@
     is_custom_attributable: true,
     isRoleable: true,
     defaults: {
+      _copyAssessmentProcedure: true,
       assessment_type: 'Control',
       status: 'Not Started',
       send_by_default: true,  // notifications when a comment is added
@@ -258,6 +259,13 @@
         this._super.apply(this, arguments);
       }
       this.bind('refreshInstance', this.refresh.bind(this));
+    },
+    before_save: function () {
+      this.attr('mappedObjectsChanges').forEach((mo)=>{
+        mo.extra = {
+          copyAssessmentProcedure: this.attr('_copyAssessmentProcedure'),
+        };
+      });
     },
     before_create: function () {
       if (!this.audit) {
