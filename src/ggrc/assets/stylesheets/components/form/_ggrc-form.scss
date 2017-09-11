@@ -96,6 +96,15 @@
       }
     }
 
+    .ggrc-form-item__checkbox-item {
+      label {
+        font-size: 14px;
+        white-space: nowrap;
+        font-weight: normal;
+        text-transform: none;
+      }
+    }
+
     .ggrc-from-item__checkbox-list {
       justify-content: flex-start;
       display: flex;
@@ -105,13 +114,6 @@
         flex-basis: 350px;
         max-width: 350px;
         margin-right: 30px;
-
-        label {
-          font-size: 14px;
-          white-space: nowrap;
-          font-weight: normal;
-          text-transform: none;
-        }
       }
     }
 
@@ -132,5 +134,9 @@
       margin-bottom: 8px;
       line-height: 10px;
     }
+  }
+
+  .ggrc-form-item_m-b-0 {
+    margin-bottom: 0;
   }
 }
