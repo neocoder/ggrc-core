@@ -22,6 +22,7 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
   && rm -rf /var/lib/apt/lists/*
 
 COPY ./provision/docker/vagrant.bashrc /root/.bashrc
+COPY ./provision/docker/ggrc-gapi-keys /root/ggrc-gapi-keys
 COPY ./git_hooks/post-checkout /home/vagrant/.git/hooks/post-checkout
 COPY ./git_hooks/post-merge /home/vagrant/.git/hooks/post-merge
 WORKDIR /vagrant

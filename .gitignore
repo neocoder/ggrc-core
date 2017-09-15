@@ -70,3 +70,6 @@ coverage
 
 # LibreOffice locks
 .~lock.*#
+
+# GGRC GAPI KEYS
+provision/docker/ggrc-gapi-keys

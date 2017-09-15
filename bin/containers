@@ -74,6 +74,13 @@ setup () {
   chmod o+r ./provision/docker/mysql
   chmod o+r ./provision/docker/mysql/*
 
+  # copying GAPI keys template file if not already present
+  if [ ! -f ./provision/docker/ggrc-gapi-keys ]; then
+    cp ./extras/ggrc-gapi-keys.template ./provision/docker/ggrc-gapi-keys
+    echo "Please add your GAPI keys to the provision/docker/ggrc-gapi-keys and run the command again"
+    exit
+  fi
+
   docker-compose --file "$DOCKERFILE" --project-name "$PROJECT" \
     build
   docker-compose --file "$DOCKERFILE" --project-name "$PROJECT" \

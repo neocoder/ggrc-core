@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+export GGRC_GAPI_KEY=""
+export GGRC_GAPI_CLIENT_ID=""
+export GGRC_GAPI_CLIENT_SECRET=""
