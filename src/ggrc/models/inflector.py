@@ -75,7 +75,7 @@ class ModelInflector(object):
   @property
   def title_singular(self):
     return getattr(self.model, 'readable_name_alias',
-                   utils.title_from_camelcase(self.model.__name__))
+                   utils.title_from_camelcase(self.model.__name__).title())
 
   @property
   def title_plural(self):
