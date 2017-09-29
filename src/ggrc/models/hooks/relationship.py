@@ -10,6 +10,7 @@ import itertools
 import sqlalchemy as sa
 
 from ggrc import db
+from ggrc.models.hooks import assessment
 from ggrc.services import signals
 from ggrc.models import all_models
 from ggrc.models.comment import Commentable
@@ -242,7 +243,7 @@ def init_hook():
   def handle_asmnt_plan(sender, objects=None, sources=None, **kwargs):
     """Handle assessment test plan"""
     # pylint: disable=unused-argument
-    for obj in objects:
+    for obj, src in zip(objects, sources):
       if (obj.source_type == "Assessment" and
           obj.destination_type == "Snapshot") or (
           obj.source_type == "Snapshot" and
@@ -253,10 +254,9 @@ def init_hook():
           asmnt, snapshot = snapshot, asmnt
 
         # Test plan of snapshotted object should be copied to
-        # Assessment test plan
-        if asmnt.assessment_type == snapshot.child_type:
-          snapshot_plan = snapshot.revision.content.get("test_plan")
-          if asmnt.test_plan and snapshot_plan:
-            asmnt.test_plan = asmnt.test_plan + "\n\n" + snapshot_plan
-          elif snapshot_plan:
-            asmnt.test_plan = snapshot_plan
+        # Assessment test plan in case of proper snapshot type
+        # and if copyAssessmentProcedure flag was sent, it should
+        # be set to True
+        if asmnt.assessment_type == snapshot.child_type and \
+           src.get("copyAssessmentProcedure") is not False:
+          assessment.copy_snapshot_plan(asmnt, snapshot, True)

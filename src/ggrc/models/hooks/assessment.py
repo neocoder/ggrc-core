@@ -91,10 +91,8 @@ def init_hook():
         # Assessment test plan should inherit test plan of snapshot
         assessment.test_plan = snapshot.revision.content.get("test_plan")
         continue
-      if template.test_plan_procedure:
-        assessment.test_plan = snapshot.revision.content['test_plan']
-      else:
-        assessment.test_plan = template.procedure_description
+      assessment.test_plan = template.procedure_description
+      copy_snapshot_plan(assessment, snapshot, template.test_plan_procedure)
       if template.template_object_type:
         assessment.assessment_type = template.template_object_type
 
@@ -102,6 +100,36 @@ def init_hook():
   def handle_assessment_put(sender, obj=None, src=None, service=None):
     # pylint: disable=unused-argument
     common.ensure_field_not_changed(obj, "audit")
+
+    if not src.get("test_plan_procedure"):
+      return
+
+    added_objs = [
+        o.get("what")
+        for o in src["mappedObjectsChanges"] if o.get("how") == "add"
+    ]
+    if not added_objs:
+      return
+
+    snapshot_ids = []
+    for added_obj in added_objs:
+      if added_obj.get("type") == "Snapshot":
+        snapshot_ids.append(added_obj["id"])
+
+    snapshots = [
+        s for s in Snapshot.query.options(
+        orm.undefer_group('Snapshot_complete'),
+        orm.Load(Snapshot).joinedload(
+            "revision"
+        ).undefer_group(
+            'Revision_complete'
+        )
+    ).filter(
+        Snapshot.id.in_(snapshot_ids)
+    )]
+    for snapshot in snapshots:
+      if snapshot.child_type == obj.assessment_type:
+        copy_snapshot_plan(obj, snapshot, True)
 
 
 def generate_assignee_relations(assessment,
@@ -231,3 +259,11 @@ def relate_ca(assessment, template):
         placeholder=definition.placeholder,
     )
     db.session.add(cad)
+
+
+def copy_snapshot_plan(assessment, snapshot, test_plan_procedure):
+  """Copy test plan of Snapshot into Assessment"""
+  if test_plan_procedure:
+    if assessment.test_plan and snapshot.revision.content['test_plan']:
+      assessment.test_plan += "<br>"
+    assessment.test_plan += snapshot.revision.content['test_plan']
