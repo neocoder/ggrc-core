@@ -92,9 +92,10 @@ def init_hook():
         assessment.test_plan = snapshot.revision.content.get("test_plan")
         continue
       if template.test_plan_procedure:
-        assessment.test_plan = snapshot.revision.content['test_plan']
-      else:
         assessment.test_plan = template.procedure_description
+        if assessment.test_plan and snapshot.revision.content['test_plan']:
+          assessment.test_plan += "\n\n"
+        assessment.test_plan = snapshot.revision.content['test_plan']
       if template.template_object_type:
         assessment.assessment_type = template.template_object_type
 
@@ -102,6 +103,40 @@ def init_hook():
   def handle_assessment_put(sender, obj=None, src=None, service=None):
     # pylint: disable=unused-argument
     common.ensure_field_not_changed(obj, "audit")
+
+    if not src.get("test_plan_procedure"):
+      return
+
+    added_objs = [
+        o.get("what")
+        for o in src["mappedObjectsChanges"] if o.get("how") == "add"
+    ]
+    if not added_objs:
+      return
+
+    snapshot_ids = []
+    for added_obj in added_objs:
+      if added_obj.get("type") == "Snapshot":
+        snapshot_ids.append(added_obj["id"])
+
+    snapshots = [
+        s for s in Snapshot.query.options(
+        orm.undefer_group('Snapshot_complete'),
+        orm.Load(Snapshot).joinedload(
+            "revision"
+        ).undefer_group(
+            'Revision_complete'
+        )
+    ).filter(
+        Snapshot.id.in_(snapshot_ids)
+    )]
+    for snapshot in snapshots:
+      if snapshot.child_type == obj.assessment_type:
+        snapshot_plan = snapshot.revision.content.get("test_plan")
+        if obj.test_plan and snapshot_plan:
+          obj.test_plan = obj.test_plan + "\n\n" + snapshot_plan
+        elif snapshot_plan:
+          obj.test_plan = snapshot_plan
 
 
 def generate_assignee_relations(assessment,
