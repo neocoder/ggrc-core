@@ -92,26 +92,15 @@
           <a data-id="hide_default_test_plan_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
         </label>
 
-	{{#if instance.test_plan_procedure}}
-	  <div class="wysiwyg-area">
-	    <textarea
-	      class="span12 triple"
-	      placeholder="Enter Description"
-	      tabindex="2"
-	      disabled
-	      ></textarea>
-	  </div>
-	{{else}}
 	<div class="wysiwyg-area">
 	  <textarea
 	    id="system_description"
-	    can-value="instance.procedure_description"
+	    ($value)="instance.procedure_description"
 	    class="span12 triple wysihtml5"
 	    placeholder="Enter Description"
 	    tabindex="2"
 	    ></textarea>
 	</div>
-	{{/if}}
       </div>
 
       <div class="span6">
