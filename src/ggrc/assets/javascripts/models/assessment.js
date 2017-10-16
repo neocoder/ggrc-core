@@ -21,6 +21,7 @@
     is_custom_attributable: true,
     isRoleable: true,
     defaults: {
+      _copyAssessmentProcedure: true,
       assessment_type: 'Control',
       status: 'Not Started',
       send_by_default: true,  // notifications when a comment is added
