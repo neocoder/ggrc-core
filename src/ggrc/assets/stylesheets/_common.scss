@@ -769,6 +769,9 @@ p {
   &.state-finished,
   &.state-completed {
     background: $status-completed;
+    &.verified {
+      background: $status-verified;
+    }
   }
   &.state-declined,
   &.state-deprecated {
@@ -842,6 +845,13 @@ p {
 
     &:before {
       background: $status-completed;
+    }
+    &.verified {
+      color: $status-verified;
+
+      &:before {
+        background: $status-verified;
+      }
     }
   }
   &.state-declined,
