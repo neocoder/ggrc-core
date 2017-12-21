@@ -151,8 +151,9 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
   class MultiChoiceMandatoryFlags(object):
     """Enum representing flags in multi_choice_mandatory bitmaps."""
     # pylint: disable=too-few-public-methods
-    COMMENT_REQUIRED = 0b01
-    EVIDENCE_REQUIRED = 0b10
+    COMMENT_REQUIRED = 0b001
+    EVIDENCE_REQUIRED = 0b010
+    URL_REQUIRED = 0b100
 
   VALID_TYPES = {
       "Text": "Text",

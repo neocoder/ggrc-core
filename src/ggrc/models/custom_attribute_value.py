@@ -3,8 +3,6 @@
 
 """Custom attribute value model"""
 
-from collections import namedtuple
-
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import and_
 from sqlalchemy import or_
@@ -331,15 +329,20 @@ class CustomAttributeValue(Base, Indexed, db.Model):
   def _check_dropdown_requirements(self):
     """Check mandatory comment and mandatory evidence for dropdown CAV."""
     failed_preconditions = []
-    options_to_flags = self._multi_choice_options_to_flags(
+    options_to_flags = self.multi_choice_options_to_flags(
         self.custom_attribute,
     )
     flags = options_to_flags.get(self.attribute_value)
     if flags:
-      if flags.comment_required:
-        failed_preconditions += self._check_mandatory_comment()
-      if flags.evidence_required:
-        failed_preconditions += self.attributable.check_mandatory_evidence()
+      for requirement in flags.keys():
+        if not flags[requirement]:
+          continue
+        if requirement == "comment":
+          failed_preconditions += self._check_mandatory_comment()
+        else:
+          failed_preconditions += self.attributable \
+                                      .check_mandatory_requirement(requirement)
+
     return failed_preconditions
 
   def _check_mandatory_comment(self):
@@ -359,28 +362,32 @@ class CustomAttributeValue(Base, Indexed, db.Model):
       return []
 
   @staticmethod
-  def _multi_choice_options_to_flags(cad):
+  def multi_choice_options_to_flags(cad):
     """Parse mandatory comment and evidence flags from dropdown CA definition.
 
     Args:
       cad - a CA definition object
 
     Returns:
-      {option_value: Flags} - a dict from dropdown options values to Flags
-                              objects where Flags.comment_required and
-                              Flags.evidence_required correspond to the values
-                              from multi_choice_mandatory bitmasks
+      {option_value: Flags} - a dict from dropdown options values to dict
+                              where keys "comment", "evidence" and "url"
+                              corresponds to the values from
+                              multi_choice_mandatory bitmasks
     """
-    flags = namedtuple("Flags", ["comment_required", "evidence_required"])
 
     def make_flags(multi_choice_mandatory):
       flags_mask = int(multi_choice_mandatory)
-      return flags(comment_required=flags_mask & (cad
-                                                  .MultiChoiceMandatoryFlags
-                                                  .COMMENT_REQUIRED),
-                   evidence_required=flags_mask & (cad
-                                                   .MultiChoiceMandatoryFlags
-                                                   .EVIDENCE_REQUIRED))
+      return {
+          "comment": flags_mask & (cad
+                                   .MultiChoiceMandatoryFlags
+                                   .COMMENT_REQUIRED),
+          "evidence": flags_mask & (cad
+                                    .MultiChoiceMandatoryFlags
+                                    .EVIDENCE_REQUIRED),
+          "url": flags_mask & (cad
+                               .MultiChoiceMandatoryFlags
+                               .URL_REQUIRED),
+      }
 
     if not cad.multi_choice_options or not cad.multi_choice_mandatory:
       return {}

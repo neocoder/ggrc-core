@@ -42,7 +42,7 @@ class CustomAttributable(object):
   _include_links = ['custom_attribute_values', 'custom_attribute_definitions']
   _update_raw = ['custom_attribute_values']
 
-  _evidence_found = None
+  _requirement_cache = None
 
   @declared_attr
   def custom_attribute_definitions(cls):  # pylint: disable=no-self-argument
@@ -505,35 +505,37 @@ class CustomAttributable(object):
     return any(c.preconditions_failed
                for c in self.custom_attribute_values)
 
-  def check_mandatory_evidence(self):
-    """Check presence of mandatory evidence.
+  def check_mandatory_requirement(self, requirement):
+    """Check presence of mandatory requirement like evidence or URL.
 
-    Note:  mandatory evidence precondition is checked only once.
-    Any additional changes to evidences after the first checking
+    Note:  mandatory requirement precondition is checked only once.
+    Any additional changes to evidences or URL after the first checking
     of the precondition will cause incorrect result of the function.
     """
     from ggrc.models.object_document import Documentable
     if isinstance(self, Documentable):
-      # Note: this is a suboptimal implementation of mandatory evidence check;
-      # it should be refactored once Evicence-CA mapping is introduced
-      def evidence_required(cav):
-        """Return True if an evidence is required for this `cav`."""
-        # pylint: disable=protected-access
-        flags = (cav._multi_choice_options_to_flags(cav.custom_attribute)
-                 .get(cav.attribute_value))
-        return flags and flags.evidence_required
 
-      if self._evidence_found is None:
-        self._evidence_found = (len(self.document_evidence) >=
-                                len([cav
-                                     for cav in self.custom_attribute_values
-                                     if evidence_required(cav)]))
+      if self._requirement_cache is None:
+        self._requirement_cache = {}
+      if requirement not in self._requirement_cache:
+        required = 0
+        for cav in self.custom_attribute_values:
+          flags = cav.multi_choice_options_to_flags(cav.custom_attribute) \
+                     .get(cav.attribute_value)
+          if flags and flags.get(requirement):
+            required += 1
 
-      if not self._evidence_found:
-        return ["evidence"]
+        fitting = {
+            "evidence": len(self.document_evidence),
+            "url": len(self.document_url),
+        }
+        self._requirement_cache[requirement] = fitting[requirement] >= required
+
+      if not self._requirement_cache[requirement]:
+        return [requirement]
 
       return []
 
   def invalidate_evidence_found(self):
     """Invalidate the cached value"""
-    self._evidence_found = None
+    self._requirement_cache = None
