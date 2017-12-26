@@ -14,7 +14,7 @@
           <span class="state-value snapshot">{{instance.class.title_singular}} version as at {{date instance.updated_at}}</span>
         {{/if}}
         {{#if status}}
-          <span class="state-value {{addclass 'state-' status separator=''}}">{{un_camel_case status}}</span>
+          <span class="state-value {{addclass 'state' status}}">{{un_camel_case status}}</span>
         {{/if}}
         {{#if snapshot.archived}}
           <span class="state-value state-archived">Archived</span>

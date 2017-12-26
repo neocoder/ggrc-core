@@ -103,7 +103,7 @@
           <div class="span9">
             <h6>Title</h6>
             <h3>{{title}}</h3>
-            <span class="state-value {{addclass 'state-' status separator=''}}">{{status}}</span>
+            <span class="state-value {{addclass 'state' status}}">{{status}}</span>
             {{#instance.next_cycle_start_date}}
               {{#if instance.unit}}
                 {{^if instance.recurrences}}

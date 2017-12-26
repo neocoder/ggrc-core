@@ -9,7 +9,7 @@
   {{/case}}
   {{#case 'status'}}
     {{#using status=instance.status}}
-      <span class="state-value-dot {{addclass 'state-' status separator=''}}">
+      <span class="state-value-dot {{addclass 'state' status}}">
         {{status}}
       </span>
     {{/using}}
