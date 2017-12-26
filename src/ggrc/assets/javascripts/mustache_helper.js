@@ -14,6 +14,7 @@ import {
 } from './plugins/utils/current-page-utils';
 import RefreshQueue from './models/refresh_queue';
 import Permission from './permission';
+import _ from 'lodash';
 
 (function ($, can) {
 // Chrome likes to cache AJAX requests for Mustaches.
@@ -78,43 +79,27 @@ var quickHash = function (str, seed) {
   return bitval;
 };
 
-Mustache.registerHelper("addclass", function (prefix, compute, options) {
+/**
+ * Builds class name of two segments - prefix and computed value
+ * @param  {String|computed} prefix class prefix
+ * @param  {String|computed} compute some computed value
+ * @param  {Object} [options={}] options
+ * @param  {Object} [options.separator='-'] separator between prefix and comuted value
+ * @param  {Object} [options.computeSeparator=''] separator which replaces whitespaces in computed value
+ * @return {String} computed class string
+ */
+Mustache.registerHelper('addclass', function (prefix, compute, options = {}) {
   prefix = resolve_computed(prefix);
-  var separator = 'separator' in (options.hash || {}) ? options.hash.separator : '-';
-  return function (el) {
-    var curClass = null
-      , wasAttached = false
-      , callback
-      ;
+  let computeVal = resolve_computed(compute);
+  let opts = options.hash || {};
+  let separator = _.isString(opts.separator) ? opts.separator : '-';
+  let computeSeparator = _.isString(opts.computeSeparator)
+    ? opts.computeSeparator : '';
+  let classSegment = _.trim(computeVal)
+    .replace(/[\s\t]+/g, computeSeparator)
+    .toLowerCase();
 
-    callback = function (_ev, newVal, _oldVal) {
-      var nowAttached = $(el).closest('body').length > 0
-        , newClass = null
-        ;
-
-      //  If we were once attached and now are not, unbind this callback.
-      if (wasAttached && !nowAttached) {
-        compute.unbind('change', callback);
-        return;
-      } else if (nowAttached && !wasAttached) {
-        wasAttached = true;
-      }
-      if (newVal && newVal.toLowerCase) {
-        newClass = prefix + newVal.toLowerCase().replace(/[\s\t]+/g, separator);
-      }
-      if (curClass) {
-        $(el).removeClass(curClass);
-        curClass = null;
-      }
-      if (newClass) {
-        $(el).addClass(newClass);
-        curClass = newClass;
-      }
-    };
-
-    compute.bind('change', callback);
-    callback(null, resolve_computed(compute));
-  };
+  return [prefix, classSegment].join(separator);
 });
 
 Mustache.registerHelper("if_equals", function (val1, val2, options) {
