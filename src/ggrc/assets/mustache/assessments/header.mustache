@@ -33,7 +33,7 @@ Copyright (C) 2017 Google Inc.
                                     {is-edit-icon-denied}="isEditIconDenied"
                                     (set-edit-mode-inline)="confirmEdit()">
                                         <h3 class="pane-header__title-name">{{instance.title}}</h3>
-                                        <div class="state-value {{addclass 'state-' instance.status separator=''}}">
+                                        <div class="state-value {{addclass 'state-' instance.status separator=''}} {{#if instance.verified}}verified{{/if}}">
                                             {{instance.status}}
                                         </div>
                                         {{#if instance.archived}}
