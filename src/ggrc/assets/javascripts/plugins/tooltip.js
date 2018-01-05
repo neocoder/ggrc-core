@@ -35,9 +35,7 @@
    */
   function isElementVisible(el) {
     const bRect = el.getBoundingClientRect();
-    const centerX = Math.round(bRect.x + bRect.width / 2);
-    const centerY = Math.round(bRect.y + bRect.height / 2);
-    const topEl = document.elementFromPoint(centerX, centerY);
+    const topEl = document.elementFromPoint(bRect.x, bRect.y);
     return topEl && (el === topEl || isChildOf(topEl, el));
   }
 
