@@ -38,7 +38,7 @@
     const centerX = Math.round(bRect.x + bRect.width / 2);
     const centerY = Math.round(bRect.y + bRect.height / 2);
     const topEl = document.elementFromPoint(centerX, centerY);
-    return el === topEl || isChildOf(topEl, el);
+    return topEl && (el === topEl || isChildOf(topEl, el));
   }
 
   /**
