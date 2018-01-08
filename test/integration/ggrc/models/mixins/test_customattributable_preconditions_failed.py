@@ -153,6 +153,20 @@ class TestPreconditionsFailed(TestCase):
     self.assertEqual(preconditions_failed, True)
     self.assertEqual(ca.value.preconditions_failed, ["evidence"])
 
+  def test_preconditions_failed_with_missing_mandatory_url(self):
+    """Preconditions failed if url required by CA is missing."""
+    ca = CustomAttributeMock(
+        self.assessment,
+        attribute_type="Dropdown",
+        dropdown_parameters=("foo,url_required", "0,4"),
+        value="url_required",
+    )
+
+    preconditions_failed = self.assessment.preconditions_failed
+
+    self.assertEqual(preconditions_failed, True)
+    self.assertEqual(ca.value.preconditions_failed, ["url"])
+
   def test_preconditions_failed_with_mandatory_comment_and_evidence(self):
     """Preconditions failed with mandatory comment and evidence missing."""
     ca = CustomAttributeMock(
@@ -167,6 +181,51 @@ class TestPreconditionsFailed(TestCase):
     self.assertEqual(preconditions_failed, True)
     self.assertEqual(set(ca.value.preconditions_failed),
                      {"comment", "evidence"})
+
+  def test_preconditions_failed_with_mandatory_url_and_evidence(self):
+    """Preconditions failed with mandatory url and evidence missing."""
+    ca = CustomAttributeMock(
+        self.assessment,
+        attribute_type="Dropdown",
+        dropdown_parameters=("foo,url_and_evidence_required", "0,6"),
+        value="url_and_evidence_required",
+    )
+
+    preconditions_failed = self.assessment.preconditions_failed
+
+    self.assertEqual(preconditions_failed, True)
+    self.assertEqual(set(ca.value.preconditions_failed),
+                     {"url", "evidence"})
+
+  def test_preconditions_failed_with_mandatory_url_and_comment(self):
+    """Preconditions failed with mandatory url and comment missing."""
+    ca = CustomAttributeMock(
+        self.assessment,
+        attribute_type="Dropdown",
+        dropdown_parameters=("foo,url_and_comment_required", "0,5"),
+        value="url_and_comment_required",
+    )
+
+    preconditions_failed = self.assessment.preconditions_failed
+
+    self.assertEqual(preconditions_failed, True)
+    self.assertEqual(set(ca.value.preconditions_failed),
+                     {"url", "comment"})
+
+  def test_preconditions_failed_with_mandatory_url_comment_and_evidence(self):
+    """Preconditions failed with mandatory url, comment and evidence missing"""
+    ca = CustomAttributeMock(
+        self.assessment,
+        attribute_type="Dropdown",
+        dropdown_parameters=("foo,url_comment_and_evidence_required", "0,7"),
+        value="url_comment_and_evidence_required",
+    )
+
+    preconditions_failed = self.assessment.preconditions_failed
+
+    self.assertEqual(preconditions_failed, True)
+    self.assertEqual(set(ca.value.preconditions_failed),
+                     {"url", "comment", "evidence"})
 
   def test_preconditions_failed_with_changed_value(self):
     """Preconditions failed and comment invalidated on update to CAV."""
@@ -381,6 +440,65 @@ class TestPreconditionsPassed(TestCase):
     factories.RelationshipFactory(
         source=self.assessment,
         destination=evidence,
+    )
+
+    preconditions_failed = self.assessment.preconditions_failed
+
+    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(ca1.value.preconditions_failed)
+    self.assertFalse(ca2.value.preconditions_failed)
+
+  def test_preconditions_failed_with_present_mandatory_url(self):
+    """No preconditions failed if url required by CA is present."""
+    ca = CustomAttributeMock(
+        self.assessment,
+        attribute_type="Dropdown",
+        dropdown_parameters=("foo,url_required", "0,4"),
+        value="url_required",
+    )
+    url = factories.UrlFactory(
+        title="Mandatory url",
+    )
+    factories.RelationshipFactory(
+        source=self.assessment,
+        destination=url,
+    )
+
+    preconditions_failed = self.assessment.preconditions_failed
+
+    self.assertEqual(preconditions_failed, False)
+    self.assertFalse(ca.value.preconditions_failed)
+
+  def test_preconditions_failed_with_several_mandatory_urls(self):
+    """No preconditions failed if URLs required by CAs are present"""
+    ca1 = CustomAttributeMock(
+        self.assessment,
+        attribute_type="Dropdown",
+        dropdown_parameters=("foo,url_required", "0,4"),
+        value="url_required"
+    )
+    ca2 = CustomAttributeMock(
+        self.assessment,
+        attribute_type="Dropdown",
+        dropdown_parameters=("foo,url_required", "0,4"),
+        value="url_required"
+    )
+    # only one URL provided yet
+    url = factories.UrlFactory(
+        title="Mandatory URL",
+    )
+    factories.RelationshipFactory(
+        source=self.assessment,
+        destination=url,
+    )
+
+    # the second URL
+    url = factories.UrlFactory(
+        title="Second mandatory URL",
+    )
+    factories.RelationshipFactory(
+        source=self.assessment,
+        destination=url,
     )
 
     preconditions_failed = self.assessment.preconditions_failed
