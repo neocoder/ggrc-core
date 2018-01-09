@@ -44,7 +44,7 @@ import template from './object-state-toolbar.mustache';
         hasErrors: {
           get: function () {
             return this.attr('instance.preconditions_failed') ||
-              this.attr('instance.hasValidationErrors');
+              this.attr('instance._hasValidationErrors');
           }
         },
         isDisabled: {
@@ -71,7 +71,7 @@ import template from './object-state-toolbar.mustache';
       },
       changeState: function (newState, isUndo) {
         if (this.attr('isDisabled')) {
-          if (this.attr('instance.hasValidationErrors')) {
+          if (this.attr('instance._hasValidationErrors')) {
             this.attr('instance').dispatch(SWITCH_TO_ERROR_PANEL);
             this.attr('instance').dispatch(SHOW_INVALID_FIELD);
           }

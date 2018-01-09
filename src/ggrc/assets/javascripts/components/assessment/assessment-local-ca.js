@@ -26,15 +26,6 @@ import Permission from '../../permission';
       highlightInvalidFields: false,
 
       define: {
-        hasValidationErrors: {
-          type: 'boolean',
-          get: function () {
-            return this.attr('fields')
-              .filter(function (field) {
-                return !field.attr('validation.valid');
-              }).length;
-          },
-        },
         editMode: {
           type: 'boolean',
           value: false,
@@ -90,12 +81,20 @@ import Permission from '../../permission';
         },
       },
       validateForm: function (triggerAttachmentModals = false) {
-        var self = this;
+        let hasValidationErrors = false;
         this.attr('fields')
-          .each(function (field) {
-            self.performValidation({field, triggerAttachmentModals});
+          .each((field) => {
+            this.performValidation({field, triggerAttachmentModals});
+            if ( !field.validation.valid ) {
+              hasValidationErrors = true;
+            }
           });
-        if (this.attr('instance.hasValidationErrors')) {
+
+        if ( this.attr('instance') ) {
+          this.attr('instance._hasValidationErrors', hasValidationErrors);
+        }
+
+        if ( hasValidationErrors ) {
           this.dispatch(VALIDATION_ERROR);
         }
       },
