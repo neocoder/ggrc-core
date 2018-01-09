@@ -83,6 +83,16 @@ const REFRESH_TAB_CONTENT = {
   type: 'refreshTabContent',
 };
 
+/**
+ * Notifies that related items are loaded
+ * @event RELATED_ITEMS_LOADED
+ * @type {object}
+ * @property {string} type - Event name.
+ */
+const RELATED_ITEMS_LOADED = {
+  type: 'RELATED_ITEMS_LOADED',
+};
+
 export {
   REFRESH_RELATED,
   SAVE_CUSTOM_ROLE,
@@ -92,4 +102,5 @@ export {
   VALIDATION_ERROR,
   DESTINATION_UNMAPPED,
   REFRESH_TAB_CONTENT,
+  RELATED_ITEMS_LOADED,
 };

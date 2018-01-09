@@ -47,7 +47,7 @@ import {
 } from '../../../plugins/utils/ca-utils';
 import DeferredTransaction from '../../../plugins/utils/deferred-transaction-utils';
 import tracker from '../../../tracker';
-import {REFRESH_TAB_CONTENT} from '../../../events/eventTypes';
+import {REFRESH_TAB_CONTENT, RELATED_ITEMS_LOADED} from '../../../events/eventTypes';
 import Permission from '../../../permission';
 import template from './info-pane.mustache';
 
@@ -186,7 +186,6 @@ import template from './info-pane.mustache';
       _verifierRoleId: undefined,
       isUpdatingRelatedItems: false,
       isAssessmentSaving: false,
-      relatedItemsLoaded: false,
       onStateChangeDfd: {},
       formState: {},
       noItemsText: '',
@@ -396,7 +395,7 @@ import template from './info-pane.mustache';
             this.attr('referenceUrls').replace(data['Document:REFERENCE_URL']);
 
             this.attr('isUpdatingRelatedItems', false);
-            this.attr('relatedItemsLoaded', true);
+            this.attr('instance').dispatch(RELATED_ITEMS_LOADED);
 
             tracker.stop(this.attr('instance.type'),
               tracker.USER_JOURNEY_KEYS.NAVIGATION,

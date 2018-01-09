@@ -8,7 +8,7 @@ import {
   applyChangesToCustomAttributeValue,
 }
   from '../../plugins/utils/ca-utils';
-import {VALIDATION_ERROR} from '../../events/eventTypes';
+import {VALIDATION_ERROR, RELATED_ITEMS_LOADED} from '../../events/eventTypes';
 import tracker from '../../tracker';
 import Permission from '../../permission';
 
@@ -48,19 +48,6 @@ import Permission from '../../permission';
           type: 'number',
           set: function (newValue, setValue) {
             setValue(newValue);
-            if (this.attr('relatedItemsLoaded')) {
-              this.validateForm();
-            }
-          },
-        },
-        relatedItemsLoaded: {
-          value: false,
-          type: 'boolean',
-          set(newValue, setValue) {
-            setValue(newValue);
-            if (newValue) {
-              this.validateForm();
-            }
           },
         },
         isEvidenceRequired: {
@@ -246,6 +233,9 @@ import Permission from '../../permission';
     },
     events: {
       '{viewModel.instance} afterCommentCreated': function () {
+        this.viewModel.validateForm();
+      },
+      '{viewModel.instance} RELATED_ITEMS_LOADED': function () {
         this.viewModel.validateForm();
       },
       '{viewModel.instance} showInvalidField': function (ev) {
