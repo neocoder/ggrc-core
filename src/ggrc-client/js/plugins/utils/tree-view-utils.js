@@ -148,7 +148,7 @@ function skipUnusable(modelName, attrList) {
 function getColumnsForModel(modelType, displayPrefs, modelName) {
   let Cacheable = can.Model.Cacheable;
   let Model = CMS.Models[modelType];
-  let modelDefinition = Model().class.root_object;
+  let modelDefinition = Model.root_object;
   let mandatoryAttrNames =
     Model.tree_view_options.mandatory_attr_names ||
     Cacheable.tree_view_options.mandatory_attr_names;

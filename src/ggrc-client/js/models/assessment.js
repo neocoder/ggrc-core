@@ -320,8 +320,6 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
         const auditors = this.audit.findRoles('Auditors');
         const auditCaptains = this.audit.findRoles('Audit Captains');
 
-        this.initCanUseIssueTracker(this.audit.issue_tracker);
-
         markForAddition(this, currentUser, 'Creators');
         if (!auditCaptains.length) {
           markForAddition(this, currentUser, 'Assignees');
@@ -404,11 +402,6 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
 
           if (this.attr('audit')) {
             this.attr('audit.title', auditTitle);
-
-            if (this.attr('audit.issue_tracker')) {
-              this.attr('can_use_issue_tracker',
-                this.attr('audit.issue_tracker.enabled'));
-            }
           }
 
           return response;

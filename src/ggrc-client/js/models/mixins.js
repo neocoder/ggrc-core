@@ -5,11 +5,21 @@
 
 import {
   buildParam,
+  makeRequest,
   batchRequests,
 } from '../plugins/utils/query-api-utils';
 import {confirm} from '../plugins/utils/modals';
 import {isSnapshot} from '../plugins/utils/snapshot-utils';
 import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
+
+const AUDIT_ISSUE_TRACKER = {
+  hotlist_id: '766459',
+  component_id: '188208',
+  issue_severity: 'S2',
+  issue_priority: 'P2',
+  issue_type: 'PROCESS',
+};
+
 
 (function (can, GGRC) {
   can.Construct.extend('can.Model.Mixin', {
@@ -227,10 +237,6 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
           let audit = valueArr[objType][queryType][0];
 
           this.attr('audit', audit);
-          if (audit && audit.issue_tracker) {
-            this.attr('can_use_issue_tracker',
-              audit.issue_tracker.enabled);
-          }
         }.bind(this));
     },
   });
@@ -264,43 +270,102 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
         this.issue_tracker = new can.Map({});
       }
 
-      this.initIssueTrackerObject();
+      if (GGRC.ISSUE_TRACKER_ENABLED) {
+        if ( this.attr('type') === 'Audit' ) {
+          this.initAuditIssueTracker();
+        } else {
+          this.ensureParentAudit().then(()=>{
+            this.initIssueTrackerForAssessment();
+          });
+        }
+      }
     },
-    initIssueTrackerObject: function (defaultValues) {
-      let issueTracker;
 
+    ensureParentAudit() {
+      const pageInstance = GGRC.page_instance();
+      const dfd = new can.Deferred();
+      if ( this.audit ) {
+        return dfd.resolve(this.audit);
+      }
+
+      if ( this.isNew() ) {
+        if ( pageInstance && pageInstance.type === 'Audit' ) {
+          this.attr('audit', pageInstance);
+        }
+      } else {
+        // audit is not page instane if AssessmentTemplate is edited
+        // from Global Search results
+        const param = buildParam('Audit', {}, {
+          type: this.type,
+          id: this.id,
+        }, ['id', 'title', 'type', 'context', 'issue_tracker']);
+
+        makeRequest({data: [param]}).then((response)=> {
+          this.audit = _.get(response, '[0].Audit.values[0]');
+          dfd.resolve(this.audit);
+        });
+      }
+
+      return dfd;
+    },
+
+    initAuditIssueTracker() {
+      this.initIssueTrackerObject(
+        new can.Map(AUDIT_ISSUE_TRACKER).attr({
+          enabled: false, // turned OFF by default for AUDIT
+        }), GGRC.ISSUE_TRACKER_ENABLED);
+    },
+
+    /**
+     * Initializes Issue Tracker for Assessment and Assessment Template
+     */
+    initIssueTrackerForAssessment() {
+      let auditItr = this.audit.issue_tracker || {};
+      let itr = this.issue_tracker || {};
+      let itrEnabled = this.isNew()
+        // turned ON for Assessment & Assessment Template by default
+        // for newly created instances
+        ? (auditItr && auditItr.enabled)
+        // for existing instance, the value from the server will be used
+        : null;
+
+      let showIssureTrackerControls = this.isNew()
+        // for new instance show controls if Issure Tracker enabled for Audit
+        ? auditItr.enabled
+        // for existing instance show controls if Issue Tracker enabled for
+        // this instance or enabled for Audit
+        : itr.enabled || auditItr.enabled;
+
+      let issueTitle = this.title || '';
+
+      this.initIssueTrackerObject(
+        new can.Map(auditItr).attr({
+          title: issueTitle,
+          enabled: itrEnabled,
+        }), showIssureTrackerControls);
+    },
+    /**
+     * Initializes issue tracker data from predefined defaults if tracker
+     * data is not available from server ( new/old instance with empty issue_tracker )
+     * @param  {Object} [defaultValues={}] issue tracker properties
+     * @param  {Boolean} [canUseIssueTracker=false] should IssueTracker controls be shown
+     */
+    initIssueTrackerObject: function (
+      defaultValues = {},
+      canUseIssueTracker = false
+    ) {
       if (!GGRC.ISSUE_TRACKER_ENABLED) {
         return;
       }
 
-      issueTracker = this.attr('issue_tracker');
-
-      if (!issueTracker || this.wasEnabled()) {
-        if (!defaultValues) {
-          defaultValues = {};
-        }
-
-        if (!this.attr('issue_tracker.enabled')) {
-          // convert to boolean
-          defaultValues.enabled = !!this.issue_tracker.enabled;
-        }
-
+      if ( !this.issueTrackerEnabled() ) {
         this.attr('issue_tracker', defaultValues);
       }
+      this.attr('can_use_issue_tracker', canUseIssueTracker);
     },
-    initCanUseIssueTracker: function (parentIssueTracker) {
-      if (parentIssueTracker && GGRC.ISSUE_TRACKER_ENABLED) {
-        this.attr('can_use_issue_tracker', parentIssueTracker.enabled);
-
-        if (parentIssueTracker.enabled && this.isNew()) {
-          // turn ON issue tracker when CREATE new instance
-          this.attr('issue_tracker.enabled', true);
-        }
-      }
-    },
-    wasEnabled: function () {
+    issueTrackerEnabled: function () {
       // 'issue_tracker' has already created if component_id is filled;
-      return !this.issue_tracker.component_id;
+      return !!(this.issue_tracker && this.issue_tracker.component_id);
     },
     'before:refresh': function () {
       // clear warnings because CanJS save prev value of warning after merge
