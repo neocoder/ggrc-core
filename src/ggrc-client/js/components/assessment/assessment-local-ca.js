@@ -4,8 +4,8 @@
  */
 
 import {
-  CA_DD_REQUIRED_DEPS,
   applyChangesToCustomAttributeValue,
+  ddValidationValueToMap,
 }
   from '../../plugins/utils/ca-utils';
 import {VALIDATION_ERROR, RELATED_ITEMS_LOADED} from '../../events/eventTypes';
@@ -55,9 +55,7 @@ import Permission from '../../permission';
               .filter(function (item) {
                 let requiredOption =
                   item.attr('validationConfig')[item.attr('value')];
-                return requiredOption === CA_DD_REQUIRED_DEPS.EVIDENCE ||
-                   requiredOption ===
-                    CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+                return ddValidationValueToMap(requiredOption).attachment;
               }).length;
             return optionsWithEvidence > this.attr('evidenceAmount');
           },
@@ -110,13 +108,8 @@ import Permission from '../../permission';
           comment: false,
         };
 
-        requiresEvidence =
-          fieldValidationConf === CA_DD_REQUIRED_DEPS.EVIDENCE ||
-          fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
-
-        requiresComment =
-          fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT ||
-          fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+        requiresEvidence = fieldValidationMap.evidence;
+        requiresComment = fieldValidationMap.comment;
 
         hasMissingEvidence = requiresEvidence &&
           !!this.attr('isEvidenceRequired');
@@ -210,8 +203,7 @@ import Permission from '../../permission';
       },
       fieldRequiresComment: function (field) {
         let fieldValidationConf = field.validationConfig[field.value];
-          return fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT ||
-            fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+        return ddValidationValueToMap(fieldValidationConf).comment;
       },
       attributeChanged: function (e) {
         e.field.attr('value', e.value);

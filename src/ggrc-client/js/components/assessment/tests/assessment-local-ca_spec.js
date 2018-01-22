@@ -3,7 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {CA_DD_REQUIRED_DEPS} from '../../../plugins/utils/ca-utils';
+import {
+  ddValidationMapToValue,
+} from '../../../plugins/utils/ca-utils';
 import Permission from '../../../permission';
 
 describe('assessmentLocalCa component', () => {
@@ -67,10 +69,17 @@ describe('assessmentLocalCa component', () => {
       dropdownField = new can.Map({
         type: 'dropdown',
         validationConfig: {
-          'nothing required': CA_DD_REQUIRED_DEPS.NONE,
-          'comment required': CA_DD_REQUIRED_DEPS.COMMENT,
-          'evidence required': CA_DD_REQUIRED_DEPS.EVIDENCE,
-          'com+ev required': CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
+          'nothing required': ddValidationMapToValue(),
+          'comment required': ddValidationMapToValue({
+            comment: true,
+          }),
+          'evidence required': ddValidationMapToValue({
+            evidence: true,
+          }),
+          'com+ev required': ddValidationMapToValue({
+            comment: true,
+            evidence: true,
+          }),
         },
         preconditions_failed: [],
         validation: {
@@ -450,10 +459,17 @@ describe('assessmentLocalCa component', () => {
         id: 2,
         type: 'dropdown',
         validationConfig: {
-          'nothing required': CA_DD_REQUIRED_DEPS.NONE,
-          'comment required': CA_DD_REQUIRED_DEPS.COMMENT,
-          'evidence required': CA_DD_REQUIRED_DEPS.EVIDENCE,
-          'com+ev required': CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
+          'nothing required': ddValidationMapToValue(),
+          'comment required': ddValidationMapToValue({
+            comment: true,
+          }),
+          'evidence required': ddValidationMapToValue({
+            evidence: true,
+          }),
+          'com+ev required': ddValidationMapToValue({
+            comment: true,
+            evidence: true,
+          }),
         },
         preconditions_failed: [],
         validation: {
@@ -519,10 +535,17 @@ describe('assessmentLocalCa component', () => {
         id: 2,
         type: 'dropdown',
         validationConfig: {
-          'nothing required': CA_DD_REQUIRED_DEPS.NONE,
-          'comment required': CA_DD_REQUIRED_DEPS.COMMENT,
-          'evidence required': CA_DD_REQUIRED_DEPS.EVIDENCE,
-          'com+ev required': CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
+          'nothing required': ddValidationMapToValue(),
+          'comment required': ddValidationMapToValue({
+            comment: true,
+          }),
+          'evidence required': ddValidationMapToValue({
+            evidence: true,
+          }),
+          'com+ev required': ddValidationMapToValue({
+            comment: true,
+            evidence: true,
+          }),
         },
         preconditions_failed: [],
         validation: {

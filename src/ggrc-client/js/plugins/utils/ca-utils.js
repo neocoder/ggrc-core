@@ -13,12 +13,6 @@ let customAttributesType = {
   Dropdown: 'dropdown',
 };
 
-let CA_DD_REQUIRED_DEPS = Object.freeze({
-  NONE: 0,
-  COMMENT: 1,
-  EVIDENCE: 2,
-  COMMENT_AND_EVIDENCE: 3,
-});
 let CUSTOM_ATTRIBUTE_TYPE = Object.freeze({
   LOCAL: 1,
   GLOBAL: 2,
@@ -377,7 +371,6 @@ export {
   getCustomAttributeType,
   convertToFormViewField,
   applyChangesToCustomAttributeValue,
-  CA_DD_REQUIRED_DEPS,
   ensureGlobalCA,
   CUSTOM_ATTRIBUTE_TYPE,
   CA_DD_FLAGS,
