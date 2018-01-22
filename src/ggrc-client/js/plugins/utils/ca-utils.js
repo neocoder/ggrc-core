@@ -24,6 +24,40 @@ let CUSTOM_ATTRIBUTE_TYPE = Object.freeze({
   GLOBAL: 2,
 });
 
+const CA_DD_FLAGS = {
+  COMMENT: 0b001, // 1
+  ATTACHMENT: 0b10, // 2
+  URL: 0b100, // 4
+};
+
+
+/**
+ * Convert DD validation value to validation map
+ * @param  {Number} value validation value
+ * @return {Object}       validation map
+ */
+function ddValidationValueToMap(value) {
+  return {
+    attachment: !!(value & CA_DD_FLAGS.ATTACHMENT),
+    comment: !!(value & CA_DD_FLAGS.COMMENT),
+    url: !!(value & CA_DD_FLAGS.URL),
+  };
+}
+
+/**
+ * Converts DD validation map to a bitmask number
+ * @param  {Object} map A map of values which must be encoded into the bitmask
+ * @return {Number}     Bitmask representing the flags map
+ */
+function ddValidationMapToValue(map = {}) {
+  let attach = map.attachment ? CA_DD_FLAGS.ATTACHMENT : 0;
+  let comment = map.comment ? CA_DD_FLAGS.COMMENT : 0;
+  let url = map.url ? CA_DD_FLAGS.URL : 0;
+
+  return attach | comment | url;
+}
+
+
 /**
  * Util methods for custom attributes.
  */
@@ -134,6 +168,7 @@ function prepareCustomAttributes(definitions, values) {
       errorsMap: {
         comment: false,
         evidence: false,
+        url: false,
       },
     };
 
@@ -345,4 +380,7 @@ export {
   CA_DD_REQUIRED_DEPS,
   ensureGlobalCA,
   CUSTOM_ATTRIBUTE_TYPE,
-}
+  CA_DD_FLAGS,
+  ddValidationValueToMap,
+  ddValidationMapToValue,
+};

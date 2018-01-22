@@ -3,6 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {
+  ddValidationValueToMap,
+  ddValidationMapToValue,
+} from '../plugins/utils/ca-utils';
+
 (function (can, $) {
   /*
    * Assessment template main component
@@ -97,11 +102,6 @@
     scope: function (attrs, parentScope, element) {
       return {
         types: parentScope.attr('types'),
-        flags: {
-          COMMENT: 0b001, // 1
-          ATTACHMENT: 0b10, // 2
-          URL: 0b100, // 4
-        },
 
         _EV_FIELD_REMOVED: 'on-remove',
 
@@ -148,13 +148,8 @@
           return _.zip(options, vals).map(function (zip) {
             let attr = new can.Map();
             let val = parseInt(zip[1], 10);
-            let attachment = !!(val & flags.ATTACHMENT);
-            let comment = !!(val & flags.COMMENT);
-            let url = !!(val & flags.URL);
             attr.attr('value', zip[0]);
-            attr.attr('attachment', attachment);
-            attr.attr('comment', comment);
-            attr.attr('url', url);
+            attr.attr(ddValidationValueToMap(val))
             return attr;
           });
         },
@@ -166,14 +161,9 @@
          * ]
          * is normalized into "2, 3" (10b, 11b).
          */
-        normalize_mandatory: function (attrs, flags) {
-          return can.map(attrs, function (attr) {
-            const attach = attr.attr('attachment') && flags.ATTACHMENT;
-            const comment = attr.attr('comment') && flags.COMMENT;
-            const url = attr.attr('url') && flags.URL;
-            return attach | comment | url;
-          }).join(',');
-        },
+        normalize_mandatory: function (attrs) {
+          return can.map(attrs, ddValidationMapToValue).join(',');
+        }
       };
     },
     events: {
@@ -186,8 +176,7 @@
        */
       init: function (element, options) {
         const field = this.scope.attr('field');
-        const flags = this.scope.attr('flags');
-        const denormalized = this.scope.denormalize_mandatory(field, flags);
+        const denormalized = this.scope.denormalize_mandatory(field);
         const types = this.scope.attr('types');
         const item = _.find(types, function (obj) {
           return obj.type === field.attr('attribute_type');
@@ -199,8 +188,7 @@
       },
       '{attrs} change': function () {
         const attrs = this.scope.attr('attrs');
-        const flags = this.scope.attr('flags');
-        const normalized = this.scope.normalize_mandatory(attrs, flags);
+        const normalized = this.scope.normalize_mandatory(attrs);
         this.scope.field.attr('multi_choice_mandatory', normalized);
       },
     },
