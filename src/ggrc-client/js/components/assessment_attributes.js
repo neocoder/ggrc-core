@@ -78,9 +78,9 @@
         // It's not nice way to rely on DOM for sorting,
         // but it was easiest for implementation
         this.scope.fields.replace(_.map(sortables,
-           function (item) {
-             return $(item).data('field');
-           }
+          function (item) {
+            return $(item).data('field');
+          }
         ));
       },
     },
@@ -97,9 +97,10 @@
     scope: function (attrs, parentScope, element) {
       return {
         types: parentScope.attr('types'),
-        pads: {
-          COMMENT: 0,
-          ATTACHMENT: 1,
+        flags: {
+          COMMENT: 0b001, // 1
+          ATTACHMENT: 0b10, // 2
+          URL: 0b100, // 4
         },
 
         _EV_FIELD_REMOVED: 'on-remove',
@@ -128,7 +129,7 @@
          * {value: 2, attachment: true, comment: false},
          * ]
          */
-        denormalize_mandatory: function (field, pads) {
+        denormalize_mandatory: function (field, flags) {
           let options = _.splitTrim(field.attr('multi_choice_options'));
           let vals = _.splitTrim(field.attr('multi_choice_mandatory'));
           let isEqualLength = options.length === vals.length;
@@ -146,12 +147,14 @@
 
           return _.zip(options, vals).map(function (zip) {
             let attr = new can.Map();
-            let val = zip[1];
-            let attachment = !!(val & 1 << pads.ATTACHMENT);
-            let comment = !!(val & 1 << pads.COMMENT);
+            let val = parseInt(zip[1], 10);
+            let attachment = !!(val & flags.ATTACHMENT);
+            let comment = !!(val & flags.COMMENT);
+            let url = !!(val & flags.URL);
             attr.attr('value', zip[0]);
             attr.attr('attachment', attachment);
             attr.attr('comment', comment);
+            attr.attr('url', url);
             return attr;
           });
         },
@@ -163,11 +166,12 @@
          * ]
          * is normalized into "2, 3" (10b, 11b).
          */
-        normalize_mandatory: function (attrs, pads) {
+        normalize_mandatory: function (attrs, flags) {
           return can.map(attrs, function (attr) {
-            let attach = attr.attr('attachment') << pads.ATTACHMENT;
-            let comment = attr.attr('comment') << pads.COMMENT;
-            return attach | comment;
+            const attach = attr.attr('attachment') && flags.ATTACHMENT;
+            const comment = attr.attr('comment') && flags.COMMENT;
+            const url = attr.attr('url') && flags.URL;
+            return attach | comment | url;
           }).join(',');
         },
       };
@@ -181,11 +185,11 @@
        * @param {Object} options - the component instantiation options
        */
       init: function (element, options) {
-        let field = this.scope.attr('field');
-        let pads = this.scope.attr('pads');
-        let denormalized = this.scope.denormalize_mandatory(field, pads);
-        let types = this.scope.attr('types');
-        let item = _.find(types, function (obj) {
+        const field = this.scope.attr('field');
+        const flags = this.scope.attr('flags');
+        const denormalized = this.scope.denormalize_mandatory(field, flags);
+        const types = this.scope.attr('types');
+        const item = _.find(types, function (obj) {
           return obj.type === field.attr('attribute_type');
         });
         this.scope.field.attr('attribute_name', item.name);
@@ -194,9 +198,9 @@
         this.scope.attr('$rootEl', $(element));
       },
       '{attrs} change': function () {
-        let attrs = this.scope.attr('attrs');
-        let pads = this.scope.attr('pads');
-        let normalized = this.scope.normalize_mandatory(attrs, pads);
+        const attrs = this.scope.attr('attrs');
+        const flags = this.scope.attr('flags');
+        const normalized = this.scope.normalize_mandatory(attrs, flags);
         this.scope.field.attr('multi_choice_mandatory', normalized);
       },
     },
