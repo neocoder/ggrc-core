@@ -145,10 +145,10 @@
                 </div>
               </div>
 
-              {{#displayAssessmentIssueTracker instance.can_use_issue_tracker}}
+              {{#if instance.can_use_issue_tracker}}
                 <info-issue-tracker-fields {instance}="instance">
                 </info-issue-tracker-fields>
-              {{/displayAssessmentIssueTracker}}
+              {{/if }}
             </div><!-- hidden-fields-area end -->
           </div><!-- custom-attr-wrap end -->
           {{>'/static/mustache/custom_attributes/info.mustache'}}

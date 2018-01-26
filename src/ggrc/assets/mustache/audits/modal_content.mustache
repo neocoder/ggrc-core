@@ -156,7 +156,7 @@
 
     {{#with_current_user_as 'current_user'}}<input type="hidden" name="modified_by_id" value="{{current_user.id}}">{{/with_current_user_as}}
 
-    {{#displayAssessmentIssueTracker instance.can_use_issue_tracker}}
+    {{#if instance.can_use_issue_tracker}}
       <div class="expanded-area">
         <div class="expand-link">
           <a class="show-hidden-fields info-show-hide active" href="javascript://">
@@ -182,7 +182,7 @@
           </div>
         </div>
       </div>
-    {{/displayAssessmentIssueTracker}}
+    {{/if }}
   </form>
 {{/instance}}
 </div>

@@ -36,13 +36,13 @@
                         </div>
                     {{/if}}
                     {{#if instance.issue_tracker.issue_url}}
-                        {{#displayAssessmentIssueTracker instance.can_use_issue_tracker}}
+                        {{#if instance.can_use_issue_tracker}}
                             <div class="issue-tracker-url">
                                 <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
                                     Ticket
                                 </a>
                             </div>
-                        {{/displayAssessmentIssueTracker}}
+                        {{/if }}
                     {{/if}}
                 </div>
             {{/if}}
@@ -528,7 +528,7 @@
                         </div>
                     </div>
                 </div>
-                {{#displayAssessmentIssueTracker instance.can_use_issue_tracker true}}
+                {{#if instance.can_use_issue_tracker}}
                     <div class="expanded-area">
                         <div class="info-expand">
                             <a class="show-hidden-fields info-show-hide active" href="javascript://">
@@ -548,7 +548,7 @@
                             </info-pane-issue-tracker-fields>
                         </div>
                     </div>
-                {{/displayAssessmentIssueTracker}}
+                {{/if }}
             </div>
             </div>
           </tab-panel>

@@ -4,7 +4,7 @@
 }}
 
 {{#if instance.issue_tracker.issue_url}}
-  {{#displayAssessmentIssueTracker instance.can_use_issue_tracker}}
+  {{#if instance.can_use_issue_tracker}}
     <div class="ggrc-form-item">
         <div class="ggrc-form-item__row">
             <div class="issue-tracker-url">
@@ -14,7 +14,7 @@
             </div>
         </div>
     </div>
-  {{/displayAssessmentIssueTracker}}
+  {{/if }}
 {{/if}}
 
 <div class="ggrc-form-item">
