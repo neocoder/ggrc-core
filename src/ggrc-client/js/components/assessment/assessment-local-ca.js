@@ -46,6 +46,9 @@ import Permission from '../../permission';
         evidenceAmount: {
           type: 'number',
         },
+        urlsAmount: {
+          type: 'number',
+        },
         isEvidenceRequired: {
           get: function () {
             let optionsWithEvidence = this.attr('fields')
@@ -58,6 +61,18 @@ import Permission from '../../permission';
                 return ddValidationValueToMap(requiredOption).attachment;
               }).length;
             return optionsWithEvidence > this.attr('evidenceAmount');
+          },
+        },
+        isUrlRequired: {
+          get: function () {
+            let optionsWithURLs = this.attr('fields')
+              .filter((item) => item.attr('type') === 'dropdown')
+              .filter(function (item) {
+                let requiredOption =
+                  item.attr('validationConfig')[item.attr('value')];
+                return ddValidationValueToMap(requiredOption).url;
+              }).length;
+            return optionsWithURLs > this.attr('urlsAmount');
           },
         },
       },
@@ -97,8 +112,10 @@ import Permission from '../../permission';
         let hasMissingEvidence;
         let hasMissingComment;
         let hasMissingValue;
+        let hasMissingUrl;
         let requiresEvidence;
         let requiresComment;
+        let requiresUrl;
         let value = field.value;
         let valCfg = field.validationConfig;
         let fieldValidationConf = valCfg && valCfg[value];
@@ -106,13 +123,19 @@ import Permission from '../../permission';
         let errorsMap = field.errorsMap || {
           evidence: false,
           comment: false,
+          url: false,
         };
 
-        requiresEvidence = fieldValidationMap.evidence;
-        requiresComment = fieldValidationMap.comment;
+        requiresEvidence =
+          ddValidationValueToMap(fieldValidationConf).attachment;
+        requiresComment = ddValidationValueToMap(fieldValidationConf).comment;
+        requiresUrl = ddValidationValueToMap(fieldValidationConf).url;
 
         hasMissingEvidence = requiresEvidence &&
           !!this.attr('isEvidenceRequired');
+
+        hasMissingUrl = requiresUrl &&
+          !!this.attr('isUrlRequired');
 
         hasMissingComment = requiresComment && !!errorsMap.comment;
 
@@ -139,12 +162,15 @@ import Permission from '../../permission';
             validation: {
               show: isMandatory || !!value,
               valid: fieldValid,
-              hasMissingInfo: (hasMissingEvidence || hasMissingComment),
-              requiresAttachment: (requiresEvidence || requiresComment),
+              hasMissingInfo: (
+                hasMissingEvidence || hasMissingComment || hasMissingUrl),
+              requiresAttachment: (
+                requiresEvidence || requiresComment || requiresUrl),
             },
             errorsMap: {
               evidence: hasMissingEvidence,
               comment: hasMissingComment,
+              url: hasMissingUrl,
             },
           });
         } else {
@@ -226,6 +252,9 @@ import Permission from '../../permission';
     },
     events: {
       '{viewModel} evidenceAmount': function () {
+        this.viewModel.validateForm();
+      },
+      '{viewModel} urlsAmount': function () {
         this.viewModel.validateForm();
       },
       [`{viewModel.instance} ${RELATED_ITEMS_LOADED.type}`]: function () {
