@@ -34,6 +34,7 @@ import './inline-item';
 import './create-url';
 import './confirm-edit-action';
 import '../../multi-select-label/multi-select-label';
+import './info-pane-evidence-urls';
 import {
   buildParam,
   batchRequests,

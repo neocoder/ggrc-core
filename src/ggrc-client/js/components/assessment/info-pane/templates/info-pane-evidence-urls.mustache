@@ -1,0 +1,49 @@
+<object-list {items}="urls" {empty-message}="noItemsText">
+    <editable-document-object-list-item {document}="{.}">
+        <confirm-edit-action
+            (set-edit-mode)="removeRelatedItem(document, 'urls')"
+            (set-in-progress)="setInProgressState()"
+            {is-edit-icon-denied}="isEditDenied"
+            {instance}="instance"
+            {on-state-change-dfd}="onStateChangeDfd">
+                <a ($click)="confirmEdit">
+                    <action-toolbar-control>
+                        <i class="fa fa-trash"></i>
+                    </action-toolbar-control>
+                </a>
+        </confirm-edit-action>
+    </editable-document-object-list-item>
+</object-list>
+{{#unless isEditDenied}}
+{{#if urlsEditMode}}
+    <create-url
+        {type}="documentTypes.urls"
+        {context}="instance.context"
+        (before-create)="addItems(%event, 'urls')"
+        (created)="addRelatedItem(%event, 'urls')">
+        <form class="create-form">
+            <fieldset class="create-form__layout">
+                <input {($value)}="value" class="create-form__input" type="text" placeholder="Add URL" spellcheck="false" autocomplete="false">
+                <div class="create-form__controls">
+                    <button type="button" class="create-form__confirm" ($click)="create; setUrlEditMode(false, 'urls')">
+                        <i class="fa fa-check"></i>
+                    </button>
+                    <button type="button" class="create-form__cancel" ($click)="clear; setUrlEditMode(false, 'urls')">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </fieldset>
+        </form>
+    </create-url>
+{{else}}
+    <confirm-edit-action
+        (set-edit-mode)="setUrlEditMode(true, 'urls')"
+        (set-in-progress)="setInProgressState()"
+        {is-edit-icon-denied}="isEditDenied"
+        {instance}="instance"
+        {on-state-change-dfd}="onStateChangeDfd">
+            <button class="btn btn-small btn-gray"
+                ($click)="confirmEdit()">Add</button>
+    </confirm-edit-action>
+{{/if}}
+{{/unless}}
