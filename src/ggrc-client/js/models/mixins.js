@@ -8,7 +8,6 @@ import {
   batchRequests,
 } from '../plugins/utils/query-api-utils';
 import {confirm} from '../plugins/utils/modals';
-import {isSnapshot} from '../plugins/utils/snapshot-utils';
 import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
 
 (function (can, GGRC) {
@@ -173,19 +172,6 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
   can.Model.Mixin('accessControlList', {
     'after:init': function () {
       if (!this.access_control_list) {
-        this.attr('access_control_list', []);
-      }
-    },
-    'before:refresh': function () {
-      // no need to rewrite access_control_list for snapshots
-      if (isSnapshot(this)) {
-        return;
-      }
-
-      // access_control_list should be set from response.
-      // if access_control_list is not empty CanJS try to merge
-      // lists from instance and response. Outcome: wrong date in ACL
-      if (this.attr('access_control_list.length') > 0) {
         this.attr('access_control_list', []);
       }
     },
