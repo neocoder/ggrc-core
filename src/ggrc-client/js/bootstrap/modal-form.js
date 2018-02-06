@@ -211,6 +211,7 @@ import {confirm} from '../plugins/utils/modals';
           }, function () {
             can.trigger(instance, 'modal:dismiss');
             can.trigger(instance, 'modal:discard');
+            this.$element.trigger('modal:discard');
             this.$element
               .find("[data-dismiss='modal'], [data-dismiss='modal-reset']")
               .trigger('click');
