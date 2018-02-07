@@ -656,6 +656,24 @@ import RefreshQueue from './refresh_queue';
       }
       return this.model(params).stub();
     },
+    /**
+     * This method clears ACL before it's filled with the data from server
+     * @param  {Object} resource resource object returned from can.ajax
+     * @return {Object}        passed resource object
+     */
+    cleanupACL: function (resource) {
+      let model;
+      const modelParams = this.object_from_resource(resource);
+      if (!modelParams) {
+        return resource;
+      }
+
+      model = this.findInCacheById(modelParams[this.id]);
+      if ( model ) {
+        model.attr('access_control_list', []);
+      }
+      return resource;
+    },
     model: function (params) {
       let model;
       params = this.object_from_resource(params);
@@ -1092,6 +1110,7 @@ import RefreshQueue from './refresh_queue';
                 delete that._pending_refresh;
                 return resources;
               })
+              .then($.proxy(that.constructor, 'cleanupACL'))
               .then($.proxy(that.constructor, 'model'))
               .done(function (response) {
                 response.backup();
