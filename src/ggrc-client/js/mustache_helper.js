@@ -1107,6 +1107,11 @@ Mustache.registerHelper("json_escape", function (obj, options) {
   */
 });
 
+Mustache.registerHelper('json_stringify', function (obj, options) {
+  let fields = (options.hash && options.hash.fields || '').split(',');
+  return JSON.stringify(_.pick(obj.serialize(), fields));
+});
+
 function localizeDate(date, options, tmpl, allowNonISO) {
   let formats = [
     'YYYY-MM-DD',
