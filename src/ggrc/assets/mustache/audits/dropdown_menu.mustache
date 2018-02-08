@@ -44,11 +44,8 @@
                 data-modal-class="modal-wide"
                 data-object-singular="{{model_info 'AssessmentTemplate' 'model_singular'}}"
                 data-object-plural="{{model_info 'AssessmentTemplate' 'root_collection'}}"
-                data-object-params='{
-                  "audit": {
-                    "id": {{instance.id}},
-                    "type": "{{json_escape instance.type}}"
-                  },
+                data-extend-new-instance='{
+                  "audit": {{json_stringify instance fields='id,type,issue_tracker'}},
                   "context": {
                     "id": {{instance.context.id}},
                     "type": "{{json_escape instance.context.type}}"

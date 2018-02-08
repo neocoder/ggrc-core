@@ -302,6 +302,11 @@ export default can.Control({
       dfd = instance.refresh();
     } else if (this.options.model) {
       if (this.options.new_object_form) {
+
+        if ( this.options.extendNewInstance ) {
+          Object.assign(params, this.options.extendNewInstance);
+        }
+
         dfd = $.when(this.options.attr(
           'instance',
           new this.options.model(params).attr('_suppress_errors', true)

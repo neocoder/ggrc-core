@@ -151,6 +151,7 @@ import Permission from '../permission';
       );
       var formTarget = $trigger.data('form-target');
       var objectParams = $trigger.attr('data-object-params');
+      var extendNewInstance = $trigger.attr('data-extend-new-instance');
       var triggerParent = $trigger.closest('.add-button');
       var model = CMS.Models[$trigger.attr('data-object-singular')] ||
         CMS.ModelHelpers[$trigger.attr('data-object-singular')];
@@ -168,6 +169,7 @@ import Permission from '../permission';
       }
 
       objectParams = objectParams ? JSON.parse(objectParams) : {};
+      extendNewInstance = extendNewInstance ? JSON.parse(extendNewInstance) : {};
 
       modalTitle =
         (instance ? 'Edit ' : 'New ') +
@@ -196,6 +198,7 @@ import Permission from '../permission';
         .ggrc_controllers_modals({
           new_object_form: !$trigger.attr('data-object-id'),
           object_params: objectParams,
+          extendNewInstance,
           button_view: isProposal ?
             BUTTON_CREATE_PROPOSAL :
             BUTTON_VIEW_SAVE_CANCEL_DELETE,
