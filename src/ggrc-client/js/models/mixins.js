@@ -268,6 +268,10 @@ const AUDIT_ISSUE_TRACKER = {
     issue_tracker_severities: ['S0', 'S1', 'S2', 'S3', 'S4'],
   }, {
     'after:init': function () {
+      this.initIssueTracker();
+    },
+
+    initIssueTracker() {
       if (!this.issue_tracker) {
         this.issue_tracker = new can.Map({});
       }
@@ -375,6 +379,9 @@ const AUDIT_ISSUE_TRACKER = {
       if (this.issue_tracker && this.issue_tracker._warnings) {
         this.issue_tracker._warnings = [];
       }
+    },
+    'after:refresh': function () {
+      this.initIssueTracker();
     },
   });
 
