@@ -91,8 +91,10 @@ const AUDIT_ISSUE_TRACKER = {
                   break;
                 case 'after':
                   obj[key] = function () {
-                    oldfn.apply(this, arguments);
-                    return fn.apply(this, arguments);
+                    let result;
+                    result = oldfn.apply(this, arguments);
+                    fn.apply(this, arguments);
+                    return result;
                   };
                   break;
                 default:
